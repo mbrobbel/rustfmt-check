@@ -1,0 +1,15 @@
+name: 'rustfmt-check'
+description: 'Format Rust code using rustfmt'
+author: 'mbrobbel'
+
+inputs:
+  token:
+    description: GitHub token
+    required: true
+  args:
+    description: Arguments for cargo. Not for rustfmt options.
+    required: false
+
+runs:
+  using: 'node12'
+  main: 'dist/index.js'
