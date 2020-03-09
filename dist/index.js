@@ -4317,6 +4317,12 @@ function run() {
         try {
             const token = core.getInput("token", { required: true });
             const git = new github.GitHub(token);
+            const head = github.context.payload.pull_request
+                ? {
+                    sha: github.context.payload.pull_request.head.sha,
+                    ref: `refs/heads/${github.context.payload.pull_request.head.ref}`
+                }
+                : { sha: github.context.sha, ref: github.context.ref };
             yield rustfmt_1.default(["-l"])
                 .then((paths) => __awaiter(this, void 0, void 0, function* () {
                 return git.git.createTree(Object.assign(Object.assign({}, github.context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
@@ -4326,13 +4332,13 @@ function run() {
                             type: "blob",
                             content: yield readFile(path, "utf8")
                         });
-                    }))), base_tree: github.context.sha }));
+                    }))), base_tree: head.sha }));
             }))
                 .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                return git.git.createCommit(Object.assign(Object.assign({}, github.context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [github.context.sha] }));
+                return git.git.createCommit(Object.assign(Object.assign({}, github.context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
             }))
                 .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                return git.git.updateRef(Object.assign(Object.assign({}, github.context.repo), { ref: github.context.ref.replace("refs/", ""), sha }));
+                return git.git.updateRef(Object.assign(Object.assign({}, github.context.repo), { ref: head.ref.replace("refs/", ""), sha }));
             }));
         }
         catch (error) {
