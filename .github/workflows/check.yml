@@ -1,0 +1,75 @@
+name: Check
+
+on: [push, pull_request]
+
+jobs:
+  pack:
+    name: Pack
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GH_PAT }}
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '13.x'
+        registry-url: https://npm.pkg.github.com
+        scope: '@actions-rs'
+    - run: npm ci --ignore-scripts
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
+    - run: npm run build
+    - run: npm run pack
+    - run: git diff --exit-code
+    - if: failure()
+      run: |
+        git config --global user.name mbrobbel
+        git config --global user.email mbrobbel@users.noreply.github.com
+        git commit -am "Create dist package"
+        git push
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '13.x'
+        registry-url: https://npm.pkg.github.com
+        scope: '@actions-rs'
+    - run: npm ci --ignore-scripts
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
+    - run: npm run build
+    - run: npm test
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '13.x'
+        registry-url: https://npm.pkg.github.com
+        scope: '@actions-rs'
+    - run: npm ci --ignore-scripts
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
+    - run: npm run format-check
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v1
+      with:
+        node-version: '13.x'
+        registry-url: https://npm.pkg.github.com
+        scope: '@actions-rs'
+    - run: npm ci --ignore-scripts
+      env:
+        NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
+    - run: npm run lint
