@@ -1,4 +1,4 @@
-name: 'rustfmt-check'
+name: 'rust-rustfmt-check'
 description: 'Format Rust code using rustfmt'
 author: 'mbrobbel'
 
