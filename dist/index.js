@@ -4320,7 +4320,7 @@ function run() {
             const head = github.context.payload.pull_request
                 ? {
                     sha: github.context.payload.pull_request.head.sha,
-                    ref: `refs/heads/${github.context.payload.pull_request.head.ref}`
+                    ref: `refs/heads/${github.context.payload.pull_request.head.ref}`,
                 }
                 : { sha: github.context.sha, ref: github.context.ref };
             yield rustfmt_1.default(["-l"])
@@ -4330,7 +4330,7 @@ function run() {
                             path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                             mode: "100644",
                             type: "blob",
-                            content: yield readFile(path, "utf8")
+                            content: yield readFile(path, "utf8"),
                         });
                     }))), base_tree: head.sha }));
             }))
@@ -10164,8 +10164,8 @@ const rustfmt = (options = []) => __awaiter(void 0, void 0, void 0, function* ()
             listeners: {
                 stdline: (data) => {
                     output.push(data);
-                }
-            }
+                },
+            },
         });
     }))
         .then(() => output.filter(Boolean));
