@@ -11,7 +11,7 @@ const output: string[] = [];
 
 const rustfmt = async (options: string[] = []): Promise<string[]> =>
   Cargo.get()
-    .then(async cargo =>
+    .then(async (cargo) =>
       cargo.call(
         [`+${toolchain}`]
           .concat(stringArgv(args))
@@ -21,8 +21,8 @@ const rustfmt = async (options: string[] = []): Promise<string[]> =>
           listeners: {
             stdline: (data: string) => {
               output.push(data);
-            }
-          }
+            },
+          },
         }
       )
     )

@@ -14,26 +14,26 @@ async function run(): Promise<void> {
     const head = github.context.payload.pull_request
       ? {
           sha: github.context.payload.pull_request.head.sha,
-          ref: `refs/heads/${github.context.payload.pull_request.head.ref}`
+          ref: `refs/heads/${github.context.payload.pull_request.head.ref}`,
         }
       : { sha: github.context.sha, ref: github.context.ref };
 
     await rustfmt(["-l"])
-      .then(async paths =>
+      .then(async (paths) =>
         git.git.createTree({
           ...github.context.repo,
           tree: await Promise.all(
             paths.map(
-              async path =>
+              async (path) =>
                 ({
                   path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                   mode: "100644",
                   type: "blob",
-                  content: await readFile(path, "utf8")
+                  content: await readFile(path, "utf8"),
                 } as any)
             )
           ),
-          base_tree: head.sha
+          base_tree: head.sha,
         })
       )
       .then(async ({ data: { sha } }) =>
@@ -41,14 +41,14 @@ async function run(): Promise<void> {
           ...github.context.repo,
           message: "Format Rust code using rustfmt",
           tree: sha,
-          parents: [head.sha]
+          parents: [head.sha],
         })
       )
       .then(async ({ data: { sha } }) =>
         git.git.updateRef({
           ...github.context.repo,
           ref: head.ref.replace("refs/", ""),
-          sha
+          sha,
         })
       );
   } catch (error) {
