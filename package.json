@@ -25,7 +25,7 @@
   "author": "mbrobbel",
   "license": "MIT",
   "dependencies": {
-    "@actions-rs/core": "0.0.8",
+    "@actions-rs/core": "0.0.9",
     "@actions/core": "^1.2.0",
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.1.1",
