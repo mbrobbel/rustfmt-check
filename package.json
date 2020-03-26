@@ -25,25 +25,25 @@
   "author": "mbrobbel",
   "license": "MIT",
   "dependencies": {
-    "@actions-rs/core": "0.0.8",
+    "@actions-rs/core": "0.0.9",
     "@actions/core": "^1.2.0",
     "@actions/exec": "^1.0.3",
     "@actions/github": "^2.1.1",
-    "@octokit/rest": "^17.1.1",
+    "@octokit/rest": "^17.1.3",
     "string-argv": "^0.3.1"
   },
   "devDependencies": {
     "@types/jest": "^25.1.4",
-    "@types/node": "^13.9.2",
-    "@typescript-eslint/parser": "^2.24.0",
-    "@zeit/ncc": "^0.21.1",
+    "@types/node": "^13.9.4",
+    "@typescript-eslint/parser": "^2.25.0",
+    "@zeit/ncc": "^0.22.0",
     "eslint": "^5.16.0",
     "eslint-plugin-github": "^3.4.1",
     "eslint-plugin-jest": "^23.8.2",
-    "jest": "^25.1.0",
-    "jest-circus": "^25.1.0",
+    "jest": "^25.2.0",
+    "jest-circus": "^25.2.0",
     "js-yaml": "^3.13.1",
-    "prettier": "^1.19.1",
+    "prettier": "^2.0.2",
     "ts-jest": "^25.2.1",
     "typescript": "^3.6.4"
   }
