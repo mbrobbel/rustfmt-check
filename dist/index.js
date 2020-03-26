@@ -5300,22 +5300,24 @@ function run() {
                     ref: `refs/heads/${github.context.payload.pull_request.head.ref}`,
                 }
                 : { sha: github.context.sha, ref: github.context.ref };
-            yield rustfmt_1.default(["-l"])
-                .then((paths) => __awaiter(this, void 0, void 0, function* () {
-                return git.git.createTree(Object.assign(Object.assign({}, github.context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
-                        return ({
-                            path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
-                            mode: "100644",
-                            type: "blob",
-                            content: yield readFile(path, "utf8"),
-                        });
-                    }))), base_tree: head.sha }));
-            }))
-                .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                return git.git.createCommit(Object.assign(Object.assign({}, github.context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
-            }))
-                .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                return git.git.updateRef(Object.assign(Object.assign({}, github.context.repo), { ref: head.ref.replace("refs/", ""), sha }));
+            yield rustfmt_1.default(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
+                return paths.length === 0
+                    ? Promise.resolve()
+                    : git.git
+                        .createTree(Object.assign(Object.assign({}, github.context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
+                            return ({
+                                path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                                mode: "100644",
+                                type: "blob",
+                                content: yield readFile(path, "utf8"),
+                            });
+                        }))), base_tree: head.sha }))
+                        .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
+                        return git.git.createCommit(Object.assign(Object.assign({}, github.context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
+                    }))
+                        .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
+                        return git.git.updateRef(Object.assign(Object.assign({}, github.context.repo), { ref: head.ref.replace("refs/", ""), sha }));
+                    }));
             }));
         }
         catch (error) {
@@ -12447,21 +12449,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const core = __importStar(__webpack_require__(470));
 const core_1 = __webpack_require__(32);
 const string_argv_1 = __importDefault(__webpack_require__(982));
-// Get inputs
-const toolchain = core.getInput("toolchain");
-const args = core.getInput("args");
-// Output buffer
 const output = [];
-const rustfmt = (options = []) => __awaiter(void 0, void 0, void 0, function* () {
+const rustfmt = (options = [], args = core.getInput("args"), toolchain = core.getInput("toolchain")) => __awaiter(void 0, void 0, void 0, function* () {
+    output.splice(0, output.length);
     return core_1.Cargo.get()
         .then((cargo) => __awaiter(void 0, void 0, void 0, function* () {
-        return cargo.call([`+${toolchain}`]
+        return cargo.call([`+${toolchain}`, `fmt`]
             .concat(string_argv_1.default(args))
-            .concat([`fmt`, `--`])
+            .concat([`--`])
             .concat(options), {
             listeners: {
-                stdline: (data) => {
-                    output.push(data);
+                stdout: (data) => {
+                    output.push(data.toString().trim());
                 },
             },
         });

@@ -2,30 +2,31 @@ import * as core from "@actions/core";
 import { Cargo } from "@actions-rs/core";
 import stringArgv from "string-argv";
 
-// Get inputs
-const toolchain = core.getInput("toolchain");
-const args = core.getInput("args");
-
-// Output buffer
 const output: string[] = [];
 
-const rustfmt = async (options: string[] = []): Promise<string[]> =>
-  Cargo.get()
+const rustfmt = async (
+  options: string[] = [],
+  args: string = core.getInput("args"),
+  toolchain = core.getInput("toolchain")
+): Promise<string[]> => {
+  output.splice(0, output.length);
+  return Cargo.get()
     .then(async (cargo) =>
       cargo.call(
-        [`+${toolchain}`]
+        [`+${toolchain}`, `fmt`]
           .concat(stringArgv(args))
-          .concat([`fmt`, `--`])
+          .concat([`--`])
           .concat(options),
         {
           listeners: {
-            stdline: (data: string) => {
-              output.push(data);
+            stdout: (data: Buffer) => {
+              output.push(data.toString().trim());
             },
           },
         }
       )
     )
     .then(() => output.filter(Boolean));
+};
 
 export default rustfmt;
