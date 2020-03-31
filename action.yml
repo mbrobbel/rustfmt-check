@@ -1,6 +1,9 @@
 name: 'rust-rustfmt-check'
 description: 'Format Rust code using rustfmt'
 author: 'mbrobbel'
+branding:
+  icon: 'feather' 
+  color: 'yellow'
 
 inputs:
   token:
