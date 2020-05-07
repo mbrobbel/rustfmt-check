@@ -27,7 +27,7 @@
   "dependencies": {
     "@actions-rs/core": "0.0.9",
     "@actions/core": "^1.2.0",
-    "@actions/exec": "^1.0.3",
+    "@actions/exec": "^1.0.4",
     "@actions/github": "^2.1.1",
     "@octokit/rest": "^17.8.0",
     "string-argv": "^0.3.1"
