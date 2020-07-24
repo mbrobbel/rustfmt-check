@@ -9,19 +9,19 @@ const readFile = promisify(readFileCallback);
 async function run(): Promise<void> {
   try {
     const token = core.getInput("token", { required: true });
-    const git = new github.GitHub(token);
+    const octokit = github.getOctokit(token);
 
-    const head = github.context.payload.pull_request
+    const head = octokit.context.payload.pull_request
       ? {
-          sha: github.context.payload.pull_request.head.sha,
-          ref: `refs/heads/${github.context.payload.pull_request.head.ref}`,
+          sha: octokit.context.payload.pull_request.head.sha,
+          ref: `refs/heads/${octokit.context.payload.pull_request.head.ref}`,
         }
-      : { sha: github.context.sha, ref: github.context.ref };
+      : { sha: octokit.context.sha, ref: octokit.context.ref };
 
     await rustfmt(["-l"]).then(async (paths) =>
       paths.length === 0
         ? Promise.resolve()
-        : git.git
+        : octokit.git
             .createTree({
               ...github.context.repo,
               tree: await Promise.all(
@@ -41,7 +41,7 @@ async function run(): Promise<void> {
               base_tree: head.sha,
             })
             .then(async ({ data: { sha } }) =>
-              git.git.createCommit({
+              octokit.git.createCommit({
                 ...github.context.repo,
                 message: "Format Rust code using rustfmt",
                 tree: sha,
@@ -49,7 +49,7 @@ async function run(): Promise<void> {
               })
             )
             .then(async ({ data: { sha } }) =>
-              git.git.updateRef({
+              octokit.git.updateRef({
                 ...github.context.repo,
                 ref: head.ref.replace("refs/", ""),
                 sha,
