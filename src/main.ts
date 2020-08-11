@@ -11,7 +11,7 @@ async function run(): Promise<void> {
     const token = core.getInput("token", { required: true });
     const octokit = github.getOctokit(token);
 
-    const head = octokit.context.payload.pull_request
+    const head = octokit.context.payload?.pull_request
       ? {
           sha: octokit.context.payload.pull_request.head.sha,
           ref: `refs/heads/${octokit.context.payload.pull_request.head.ref}`,

@@ -4358,15 +4358,15 @@ const util_1 = __webpack_require__(669);
 const rustfmt_1 = __importDefault(__webpack_require__(620));
 const readFile = util_1.promisify(fs_1.readFile);
 function run() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput("token", { required: true });
             const octokit = github.getOctokit(token);
-            const head = octokit.context.payload.pull_request
-                ? {
-                    sha: octokit.context.payload.pull_request.head.sha,
-                    ref: `refs/heads/${octokit.context.payload.pull_request.head.ref}`,
-                }
+            const head = ((_a = octokit.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) ? {
+                sha: octokit.context.payload.pull_request.head.sha,
+                ref: `refs/heads/${octokit.context.payload.pull_request.head.ref}`,
+            }
                 : { sha: octokit.context.sha, ref: octokit.context.ref };
             yield rustfmt_1.default(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
                 return paths.length === 0
