@@ -4358,21 +4358,22 @@ const util_1 = __webpack_require__(669);
 const rustfmt_1 = __importDefault(__webpack_require__(620));
 const readFile = util_1.promisify(fs_1.readFile);
 function run() {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput("token", { required: true });
             const octokit = github.getOctokit(token);
-            const head = ((_a = octokit.context.payload) === null || _a === void 0 ? void 0 : _a.pull_request) ? {
-                sha: octokit.context.payload.pull_request.head.sha,
-                ref: `refs/heads/${octokit.context.payload.pull_request.head.ref}`,
-            }
-                : { sha: octokit.context.sha, ref: octokit.context.ref };
+            const context = github.context;
+            const head = context.eventName === "pull_request" && context.payload.pull_request
+                ? {
+                    sha: context.payload.pull_request.head.sha,
+                    ref: `refs/heads/${context.payload.pull_request.head.ref}`,
+                }
+                : { sha: context.sha, ref: context.ref };
             yield rustfmt_1.default(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
                 return paths.length === 0
                     ? Promise.resolve()
                     : octokit.git
-                        .createTree(Object.assign(Object.assign({}, github.context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
+                        .createTree(Object.assign(Object.assign({}, context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
                             return ({
                                 path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                                 mode: "100644",
@@ -4381,10 +4382,10 @@ function run() {
                             });
                         }))), base_tree: head.sha }))
                         .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                        return octokit.git.createCommit(Object.assign(Object.assign({}, github.context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
+                        return octokit.git.createCommit(Object.assign(Object.assign({}, context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
                     }))
                         .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                        return octokit.git.updateRef(Object.assign(Object.assign({}, github.context.repo), { ref: head.ref.replace("refs/", ""), sha }));
+                        return octokit.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: head.ref.replace("refs/", ""), sha }));
                     }));
             }));
         }
