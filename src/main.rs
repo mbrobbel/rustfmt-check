@@ -1,11 +1,7 @@
-fn  main() {
-    
-    println!(            "Hello, {}!",
-                                 world()
-    );
+fn main() {
+    println!("Hello, {}!", world());
 }
 
-fn world( ) -> &'static str  {
+fn world() -> &'static str {
     "world"
-
-    }
+}
