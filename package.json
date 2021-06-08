@@ -26,7 +26,7 @@
   "license": "MIT",
   "dependencies": {
     "@actions-rs/core": "^0.1.3",
-    "@actions/core": "^1.2.6",
+    "@actions/core": "^1.4.0",
     "@actions/exec": "^1.0.4",
     "@actions/github": "^4.0.0",
     "@octokit/rest": "^18.5.3",
