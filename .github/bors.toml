@@ -1,0 +1,7 @@
+status = [
+  "Pack",
+  "Test",
+  "Format",
+  "Lint"
+]
+delete_merged_branches = true
