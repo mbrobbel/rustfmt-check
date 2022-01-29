@@ -28,8 +28,8 @@ jobs:
         run: git diff --exit-code
       - if: github.event_name == 'push' && github.ref == 'refs/heads/master' && failure()
         run: |
-          git config --global user.name mbrobbel
-          git config --global user.email mbrobbel@users.noreply.github.com
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git commit -am "Create dist package"
           git push
 
