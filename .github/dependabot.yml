@@ -12,8 +12,10 @@ updates:
       interval: daily
     registries:
       - npm-github
+    rebase-strategy: "disabled"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    rebase-strategy: "disabled"
