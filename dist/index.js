@@ -5314,7 +5314,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -5336,7 +5336,7 @@ const github = __importStar(__webpack_require__(469));
 const fs_1 = __webpack_require__(747);
 const util_1 = __webpack_require__(669);
 const rustfmt_1 = __importDefault(__webpack_require__(620));
-const readFile = util_1.promisify(fs_1.readFile);
+const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -5349,7 +5349,7 @@ function run() {
                     ref: `refs/heads/${context.payload.pull_request.head.ref}`,
                 }
                 : { sha: context.sha, ref: context.ref };
-            yield rustfmt_1.default(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
+            yield (0, rustfmt_1.default)(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
                 return paths.length === 0
                     ? Promise.resolve()
                     : octokit.git
@@ -14593,7 +14593,7 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
     __setModuleDefault(result, mod);
     return result;
 };
@@ -14619,7 +14619,7 @@ const rustfmt = (options = [], args = core.getInput("args"), toolchain = core.ge
     return core_1.Cargo.get()
         .then((cargo) => __awaiter(void 0, void 0, void 0, function* () {
         return cargo.call([`+${toolchain}`, `fmt`]
-            .concat(string_argv_1.default(args))
+            .concat((0, string_argv_1.default)(args))
             .concat([`--`])
             .concat(options), {
             listeners: {
