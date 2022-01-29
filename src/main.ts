@@ -23,7 +23,7 @@ async function run(): Promise<void> {
     await rustfmt(["-l"]).then(async (paths) =>
       paths.length === 0
         ? Promise.resolve()
-        : octokit.git
+        : octokit.rest.git
             .createTree({
               ...context.repo,
               tree: await Promise.all(
@@ -43,7 +43,7 @@ async function run(): Promise<void> {
               base_tree: head.sha,
             })
             .then(async ({ data: { sha } }) =>
-              octokit.git.createCommit({
+              octokit.rest.git.createCommit({
                 ...context.repo,
                 message: "Format Rust code using rustfmt",
                 tree: sha,
@@ -51,7 +51,7 @@ async function run(): Promise<void> {
               })
             )
             .then(async ({ data: { sha } }) =>
-              octokit.git.updateRef({
+              octokit.rest.git.updateRef({
                 ...context.repo,
                 ref: head.ref.replace("refs/", ""),
                 sha,
