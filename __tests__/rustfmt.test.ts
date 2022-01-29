@@ -9,7 +9,7 @@ test("rustfmt check output is empty when nothing is required", async () => {
 test("rustfmt check output fails if formatting is required", async () => {
   try {
     await rustfmt(["-l", "--check"]);
-  } catch (e) {
+  } catch (e: any) {
     expect(e.message).toContain(".cargo/bin/cargo' failed with exit code 1");
   }
 });
