@@ -1,15 +1,19 @@
 version: 2
 registries:
-  npm-registry-npm-pkg-github-com:
+  npm-github:
     type: npm-registry
     url: https://npm.pkg.github.com
-    token: "${{secrets.NPM_REGISTRY_NPM_PKG_GITHUB_COM_TOKEN}}"
+    token: ${{secrets.NPM_AUTH}}
 
 updates:
-- package-ecosystem: npm
-  directory: "/"
-  schedule:
-    interval: daily
-  open-pull-requests-limit: 99
-  registries:
-  - npm-registry-npm-pkg-github-com
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: daily
+    registries:
+      - npm-github
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
