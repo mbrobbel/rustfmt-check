@@ -28,7 +28,7 @@
     "@actions-rs/core": "^0.1.6",
     "@actions/core": "^1.6.0",
     "@actions/exec": "^1.1.0",
-    "@actions/github": "^5.0.0",
+    "@actions/github": "^5.0.1",
     "@octokit/rest": "^18.12.0",
     "string-argv": "^0.3.1"
   },
