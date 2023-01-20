@@ -6,11 +6,11 @@
   "main": "lib/main.js",
   "scripts": {
     "build": "tsc",
-    "format": "prettier --write **/*.ts",
-    "format-check": "prettier --check **/*.ts",
+    "format": "prettier --write '**/*.ts'",
+    "format-check": "prettier --check '**/*.ts'",
     "lint": "eslint src/**/*.ts",
-    "pack": "ncc build",
-    "test": "jest -i",
+    "pack": "ncc build --source-map --license LICENSE",
+    "test": "jest",
     "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
   },
   "repository": {
@@ -25,27 +25,23 @@
   "author": "mbrobbel",
   "license": "MIT",
   "dependencies": {
-    "@actions-rs/core": "^0.1.6",
-    "@actions/core": "^1.7.0",
+    "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.1",
-    "@actions/github": "^5.0.1",
-    "@octokit/rest": "^18.12.0",
+    "@actions/github": "^5.1.1",
     "string-argv": "^0.3.1"
   },
   "devDependencies": {
     "@types/jest": "^27.4.1",
-    "@types/node": "^17.0.31",
-    "@typescript-eslint/eslint-plugin": "^4.0.0",
-    "@typescript-eslint/parser": "^3.10.1",
-    "@zeit/ncc": "^0.22.3",
-    "eslint": "^7.32.0",
-    "eslint-plugin-github": "^4.1.1",
+    "@types/node": "^18.11.0",
+    "@typescript-eslint/parser": "^5.47.0",
+    "@vercel/ncc": "^0.31.1",
+    "eslint": "^8.0.1",
+    "eslint-plugin-github": "^4.3.2",
     "eslint-plugin-jest": "^26.0.0",
-    "jest": "^26.6.3",
-    "jest-circus": "^27.5.1",
+    "jest": "^27.1.2",
     "js-yaml": "^4.1.0",
-    "prettier": "^2.6.2",
-    "ts-jest": "^26.5.5",
+    "prettier": "^2.8.1",
+    "ts-jest": "^27.1.2",
     "typescript": "^4.6.3"
   }
 }
