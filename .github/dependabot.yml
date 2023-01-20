@@ -1,21 +1,14 @@
 version: 2
-registries:
-  npm-github:
-    type: npm-registry
-    url: https://npm.pkg.github.com
-    token: ${{secrets.NPM_AUTH}}
 
 updates:
   - package-ecosystem: npm
     directory: "/"
     schedule:
       interval: daily
-    registries:
-      - npm-github
-    rebase-strategy: "disabled"
+    rebase-strategy: disabled
 
-  - package-ecosystem: "github-actions"
+  - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: "daily"
-    rebase-strategy: "disabled"
+      interval: daily
+    rebase-strategy: disabled

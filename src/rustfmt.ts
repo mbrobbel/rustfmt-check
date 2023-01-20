@@ -1,30 +1,26 @@
 import * as core from "@actions/core";
-import { Cargo } from "@actions-rs/core";
+import * as exec from "@actions/exec";
 import stringArgv from "string-argv";
 
 const output: string[] = [];
 
 const rustfmt = async (
   options: string[] = [],
-  args: string = core.getInput("args"),
-  toolchain = core.getInput("toolchain")
+  args: string = core.getInput("args")
 ): Promise<string[]> => {
   output.splice(0, output.length);
-  return Cargo.get()
-    .then(async (cargo) =>
-      cargo.call(
-        [`+${toolchain}`, `fmt`]
-          .concat(stringArgv(args))
-          .concat([`--`])
-          .concat(options),
-        {
-          listeners: {
-            stdout: (data: Buffer) => {
-              output.push(data.toString().trim());
-            },
+
+  return exec
+    .exec(
+      "cargo",
+      ["fmt"].concat(stringArgv(args)).concat(["--"]).concat(options),
+      {
+        listeners: {
+          stdout: (data: Buffer) => {
+            output.push(data.toString().trim());
           },
-        }
-      )
+        },
+      }
     )
     .then(() => output.filter(Boolean));
 };

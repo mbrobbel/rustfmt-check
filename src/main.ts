@@ -27,18 +27,12 @@ async function run(): Promise<void> {
             .createTree({
               ...context.repo,
               tree: await Promise.all(
-                paths.map(
-                  async (path) =>
-                    ({
-                      path: path.replace(
-                        `${process.env.GITHUB_WORKSPACE}/`,
-                        ""
-                      ),
-                      mode: "100644",
-                      type: "blob",
-                      content: await readFile(path, "utf8"),
-                    } as any)
-                )
+                paths.map(async (path) => ({
+                  path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                  mode: "100644",
+                  type: "blob",
+                  content: await readFile(path, "utf8"),
+                }))
               ),
               base_tree: head.sha,
             })

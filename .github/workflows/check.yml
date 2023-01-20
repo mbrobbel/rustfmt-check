@@ -16,20 +16,16 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3.1.1
         with:
-          node-version: "16.x"
-          registry-url: https://npm.pkg.github.com
-          scope: "@actions-rs"
+          node-version: "16"
       - run: npm ci --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
       - run: npm run build
       - run: npm run pack
       - if: github.event_name == 'push' && github.ref == 'refs/heads/master'
         run: git diff --exit-code
       - if: github.event_name == 'push' && github.ref == 'refs/heads/master' && failure()
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git commit -am "Create dist package"
           git push
 
@@ -40,12 +36,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3.1.1
         with:
-          node-version: "16.x"
-          registry-url: https://npm.pkg.github.com
-          scope: "@actions-rs"
+          node-version: "16"
       - run: npm ci --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
       - run: npm run build
       - run: npm test
 
@@ -56,12 +48,8 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3.1.1
         with:
-          node-version: "16.x"
-          registry-url: https://npm.pkg.github.com
-          scope: "@actions-rs"
+          node-version: "16"
       - run: npm ci --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
       - run: npm run format-check
 
   lint:
@@ -71,10 +59,6 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3.1.1
         with:
-          node-version: "16.x"
-          registry-url: https://npm.pkg.github.com
-          scope: "@actions-rs"
+          node-version: "16"
       - run: npm ci --ignore-scripts
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_AUTH}}
       - run: npm run lint
