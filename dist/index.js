@@ -1,6 +1,73 @@
 require('./sourcemap-register.js');/******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 7657:
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
+
+"use strict";
+
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const core = __importStar(__nccwpck_require__(2186));
+const exec = __importStar(__nccwpck_require__(1514));
+const string_argv_1 = __importDefault(__nccwpck_require__(9453));
+const check = (args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = [];
+    const add = (data) => {
+        JSON.parse(data.toString().trim()).forEach((output) => {
+            output.mismatches.forEach((mismatch) => {
+                result.push({ path: output.name, mismatch });
+            });
+        });
+    };
+    yield exec.exec("cargo", ["+nightly", "fmt"]
+        .concat((0, string_argv_1.default)(args))
+        .concat(["--", "--emit", "json"]), {
+        listeners: {
+            stdout: add,
+        },
+    });
+    return result;
+});
+exports["default"] = check;
+
+
+/***/ }),
+
 /***/ 3109:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
@@ -46,6 +113,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const fs_1 = __nccwpck_require__(7147);
 const util_1 = __nccwpck_require__(3837);
+const check_1 = __importDefault(__nccwpck_require__(7657));
 const rustfmt_1 = __importDefault(__nccwpck_require__(6686));
 const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
@@ -54,31 +122,68 @@ function run() {
             const token = core.getInput("token", { required: true });
             const octokit = github.getOctokit(token);
             const context = github.context;
-            const head = context.eventName === "pull_request" && context.payload.pull_request
-                ? {
-                    sha: context.payload.pull_request.head.sha,
-                    ref: `refs/heads/${context.payload.pull_request.head.ref}`,
-                }
-                : { sha: context.sha, ref: context.ref };
-            yield (0, rustfmt_1.default)(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
-                return paths.length === 0
-                    ? Promise.resolve()
-                    : octokit.rest.git
-                        .createTree(Object.assign(Object.assign({}, context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
-                            return ({
-                                path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
-                                mode: "100644",
-                                type: "blob",
-                                content: yield readFile(path, "utf8"),
-                            });
-                        }))), base_tree: head.sha }))
-                        .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                        return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
-                    }))
-                        .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                        return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: head.ref.replace("refs/", ""), sha }));
-                    }));
-            }));
+            const mode = core.getInput("mode");
+            switch (mode) {
+                case "commit":
+                    {
+                        const head = context.eventName === "pull_request" && context.payload.pull_request
+                            ? {
+                                sha: context.payload.pull_request.head.sha,
+                                ref: `refs/heads/${context.payload.pull_request.head.ref}`,
+                            }
+                            : { sha: context.sha, ref: context.ref };
+                        yield (0, rustfmt_1.default)(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
+                            return paths.length === 0
+                                ? // No formatting required
+                                    Promise.resolve()
+                                : octokit.rest.git
+                                    .createTree(Object.assign(Object.assign({}, context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
+                                        return ({
+                                            path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                                            mode: "100644",
+                                            type: "blob",
+                                            content: yield readFile(path, "utf8"),
+                                        });
+                                    }))), base_tree: head.sha }))
+                                    .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
+                                    return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
+                                }))
+                                    .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
+                                    return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: head.ref.replace("refs/", ""), sha }));
+                                }));
+                        }));
+                    }
+                    break;
+                case "review":
+                    {
+                        if (!context.payload.pull_request) {
+                            throw new Error("Review mode requires a pull_request event trigger");
+                        }
+                        const output = yield (0, check_1.default)();
+                        if (output.length === 0) {
+                            Promise.resolve();
+                        }
+                        else {
+                            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using rustfmt`, event: "COMMENT", comments: output.map((result) => ({
+                                    path: result.path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                                    body: `\`\`\`suggestion
+${result.mismatch.expected}\`\`\``,
+                                    start_line: result.mismatch.original_end_line ===
+                                        result.mismatch.original_begin_line
+                                        ? undefined
+                                        : result.mismatch.original_begin_line,
+                                    line: result.mismatch.original_end_line ===
+                                        result.mismatch.original_begin_line
+                                        ? result.mismatch.original_begin_line
+                                        : result.mismatch.original_end_line,
+                                    side: "RIGHT",
+                                })) }));
+                        }
+                    }
+                    break;
+                default:
+                    throw new Error(`Unsupported mode: ${mode}`);
+            }
         }
         catch (error) {
             core.setFailed(error.message);
@@ -134,9 +239,8 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9453));
-const output = [];
 const rustfmt = (options = [], args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
-    output.splice(0, output.length);
+    const output = [];
     return exec
         .exec("cargo", ["fmt"].concat((0, string_argv_1.default)(args)).concat(["--"]).concat(options), {
         listeners: {

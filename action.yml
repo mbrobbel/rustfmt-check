@@ -12,6 +12,14 @@ inputs:
   args:
     description: Arguments for cargo. Not for rustfmt options.
     required: false
+  mode:
+    type: choice
+    description: Output mode
+    default: commit
+    options:
+      - commit
+      - review
+    required: false
 
 runs:
   using: node16
