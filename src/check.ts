@@ -25,7 +25,7 @@ const check = async (
   args: string = core.getInput("args")
 ): Promise<Result[]> => {
   const result: Result[] = [];
-  const add = (data: Buffer) => {
+  const add = (data: Buffer): void => {
     JSON.parse(data.toString().trim()).forEach((output: Output) => {
       output.mismatches.forEach((mismatch) => {
         result.push({ path: output.name, mismatch });
