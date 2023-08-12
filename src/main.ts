@@ -32,7 +32,7 @@ async function run(): Promise<void> {
                   mode: "100644",
                   type: "blob",
                   content: await readFile(path, "utf8"),
-                }))
+                })),
               ),
               base_tree: head.sha,
             })
@@ -42,15 +42,15 @@ async function run(): Promise<void> {
                 message: "Format Rust code using rustfmt",
                 tree: sha,
                 parents: [head.sha],
-              })
+              }),
             )
             .then(async ({ data: { sha } }) =>
               octokit.rest.git.updateRef({
                 ...context.repo,
                 ref: head.ref.replace("refs/", ""),
                 sha,
-              })
-            )
+              }),
+            ),
     );
   } catch (error: any) {
     core.setFailed(error.message);

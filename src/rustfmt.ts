@@ -6,7 +6,7 @@ const output: string[] = [];
 
 const rustfmt = async (
   options: string[] = [],
-  args: string = core.getInput("args")
+  args: string = core.getInput("args"),
 ): Promise<string[]> => {
   output.splice(0, output.length);
 
@@ -20,7 +20,7 @@ const rustfmt = async (
             output.push(data.toString().trim());
           },
         },
-      }
+      },
     )
     .then(() => output.filter(Boolean));
 };
