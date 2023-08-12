@@ -54,6 +54,7 @@ function run() {
             const token = core.getInput("token", { required: true });
             const octokit = github.getOctokit(token);
             const context = github.context;
+            const message = core.getInput("commit-message", { required: false });
             const head = context.eventName === "pull_request" && context.payload.pull_request
                 ? {
                     sha: context.payload.pull_request.head.sha,
@@ -73,7 +74,7 @@ function run() {
                             });
                         }))), base_tree: head.sha }))
                         .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
-                        return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message: "Format Rust code using rustfmt", tree: sha, parents: [head.sha] }));
+                        return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message, tree: sha, parents: [head.sha] }));
                     }))
                         .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
                         return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: head.ref.replace("refs/", ""), sha }));
