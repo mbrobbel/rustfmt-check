@@ -12,6 +12,10 @@ inputs:
   args:
     description: Arguments for cargo. Not for rustfmt options.
     required: false
+  commit-message:
+    description: Commit message for formatting commits.
+    required: false
+    default: Format Rust code using rustfmt
 
 runs:
   using: node16
