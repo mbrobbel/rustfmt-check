@@ -11,6 +11,7 @@ async function run(): Promise<void> {
     const token = core.getInput("token", { required: true });
     const octokit = github.getOctokit(token);
     const context = github.context;
+    const message = core.getInput("commit-message", { required: false });
 
     const head =
       context.eventName === "pull_request" && context.payload.pull_request
@@ -39,7 +40,7 @@ async function run(): Promise<void> {
             .then(async ({ data: { sha } }) =>
               octokit.rest.git.createCommit({
                 ...context.repo,
-                message: "Format Rust code using rustfmt",
+                message,
                 tree: sha,
                 parents: [head.sha],
               })
