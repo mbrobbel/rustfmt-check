@@ -83,7 +83,7 @@ async function run(): Promise<void> {
                 user?.id === 41898282 && state === "CHANGES_REQUESTED",
             )?.id;
           if (review_id !== undefined) {
-            core.info(`Removing review: ${review_id}.`);
+            core.debug(`Removing review: ${review_id}.`);
             // Delete outdated comments
             const review_comments =
               await octokit.rest.pulls.listCommentsForReview({
@@ -93,7 +93,7 @@ async function run(): Promise<void> {
               });
             await Promise.all(
               review_comments.data.map(({ id }) => {
-                core.info(`Removing review comment: ${id}.`);
+                core.debug(`Removing review comment: ${id}.`);
                 octokit.rest.pulls.deleteReviewComment({
                   ...context.repo,
                   comment_id: id,
@@ -101,7 +101,7 @@ async function run(): Promise<void> {
               }),
             );
             // Dismiss review
-            core.info(`Dismiss review: ${review_id}.`);
+            core.debug(`Dismiss review: ${review_id}.`);
             await octokit.rest.pulls.dismissReview({
               ...context.repo,
               pull_number: context.issue.number,
@@ -109,12 +109,13 @@ async function run(): Promise<void> {
               message: "",
             });
           } else {
-            core.info(`No existing reviews found.`);
+            core.debug(`No existing reviews found.`);
           }
           // Check current state
           const output = await check();
           if (output.length === 0) {
             // Approve
+            core.debug("Approve review");
             await octokit.rest.pulls.createReview({
               ...context.repo,
               pull_number: context.issue.number,
@@ -123,6 +124,7 @@ async function run(): Promise<void> {
             Promise.resolve();
           } else {
             // Request changes
+            core.debug("Request changes");
             await octokit.rest.pulls.createReview({
               ...context.repo,
               pull_number: context.issue.number,

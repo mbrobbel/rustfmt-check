@@ -165,31 +165,33 @@ function run() {
                         const reviews = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number }));
                         const review_id = (_a = reviews.data
                             .reverse()
-                            .find(({ user, state }) => ((user === null || user === void 0 ? void 0 : user.id) === 41898282 && state === "CHANGES_REQUESTED"))) === null || _a === void 0 ? void 0 : _a.id;
+                            .find(({ user, state }) => (user === null || user === void 0 ? void 0 : user.id) === 41898282 && state === "CHANGES_REQUESTED")) === null || _a === void 0 ? void 0 : _a.id;
                         if (review_id !== undefined) {
-                            core.info(`Removing review: ${review_id}.`);
+                            core.debug(`Removing review: ${review_id}.`);
                             // Delete outdated comments
                             const review_comments = yield octokit.rest.pulls.listCommentsForReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id }));
                             yield Promise.all(review_comments.data.map(({ id }) => {
-                                core.info(`Removing review comment: ${id}.`);
+                                core.debug(`Removing review comment: ${id}.`);
                                 octokit.rest.pulls.deleteReviewComment(Object.assign(Object.assign({}, context.repo), { comment_id: id }));
                             }));
                             // Dismiss review
-                            core.info(`Dismiss review: ${review_id}.`);
+                            core.debug(`Dismiss review: ${review_id}.`);
                             yield octokit.rest.pulls.dismissReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id, message: "" }));
                         }
                         else {
-                            core.info(`No existing reviews found.`);
+                            core.debug(`No existing reviews found.`);
                         }
                         // Check current state
                         const output = yield (0, check_1.default)();
                         if (output.length === 0) {
                             // Approve
+                            core.debug("Approve review");
                             yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, event: "APPROVE" }));
                             Promise.resolve();
                         }
                         else {
                             // Request changes
+                            core.debug("Request changes");
                             yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using rustfmt`, event: "REQUEST_CHANGES", comments: output.map((result) => ({
                                     path: result.path.replace(`${process.env.GITHUB_WORKSPACE} / `, ""),
                                     body: `\`\`\`suggestion
