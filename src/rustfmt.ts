@@ -4,7 +4,7 @@ import stringArgv from "string-argv";
 
 const rustfmt = async (
   options: string[] = [],
-  args: string = core.getInput("args")
+  args: string = core.getInput("args"),
 ): Promise<string[]> => {
   const output: string[] = [];
   return exec
@@ -17,7 +17,7 @@ const rustfmt = async (
             output.push(data.toString().trim());
           },
         },
-      }
+      },
     )
     .then(() => output.filter(Boolean));
 };

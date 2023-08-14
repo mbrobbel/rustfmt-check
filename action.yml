@@ -13,13 +13,13 @@ inputs:
     description: Arguments for cargo. Not for rustfmt options.
     required: false
   mode:
-    type: choice
-    description: Output mode
+    description: Output mode (commit or review)
     default: commit
-    options:
-      - commit
-      - review
     required: false
+  commit-message:
+    description: Commit message for formatting commits.
+    required: false
+    default: Format Rust code using rustfmt
 
 runs:
   using: node16
