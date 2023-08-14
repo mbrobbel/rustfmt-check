@@ -78,8 +78,9 @@ async function run(): Promise<void> {
           });
           const review_id = reviews.data
             .reverse()
-            .find(({ user }) => user?.login === "github-actions[bot]")?.id;
+            .find(({ user }) => user?.id === 41898282)?.id;
           if (review_id !== undefined) {
+            core.info(`Removing review: ${review_id}.`);
             // Delete outdated comments
             const review_comments = await octokit.rest.pulls.listCommentsForReview({
               ...context.repo,
@@ -87,18 +88,22 @@ async function run(): Promise<void> {
               review_id,
             });
             await Promise.all(review_comments.data.map(({ id }) => {
+              core.info(`Removing review comment: ${id}.`);
               octokit.rest.pulls.deleteReviewComment({
                 ...context.repo,
                 comment_id: id
               })
             }));
             // Dismiss review
+            core.info(`Dismiss review: ${review_id}.`);
             await octokit.rest.pulls.dismissReview({
               ...context.repo,
               pull_number: context.issue.number,
               review_id,
               message: "Updating review",
             });
+          } else {
+            core.info(`No existing reviews found.`);
           }
           // Check current state
           const output = await check();
@@ -119,7 +124,7 @@ async function run(): Promise<void> {
               event: "REQUEST_CHANGES",
               comments: output.map((result) => ({
                 path: result.path.replace(
-                  `${process.env.GITHUB_WORKSPACE}/`,
+                  `${process.env.GITHUB_WORKSPACE} / `,
                   "",
                 ),
                 body: `\`\`\`suggestion
