@@ -176,7 +176,7 @@ function run() {
                             }));
                             // Dismiss review
                             core.debug(`Dismiss review: ${review_id}.`);
-                            yield octokit.rest.pulls.dismissReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id, message: "" }));
+                            yield octokit.rest.pulls.dismissReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id, message: "Removing outdated review." }));
                         }
                         else {
                             core.debug(`No existing reviews found.`);
@@ -192,7 +192,7 @@ function run() {
                         else {
                             // Request changes
                             core.debug("Request changes");
-                            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using rustfmt`, event: "REQUEST_CHANGES", comments: output.map((result) => ({
+                            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using [rustfmt](https://github.com/rust-lang/rustfmt): \`cargo fmt\``, event: "REQUEST_CHANGES", comments: output.map((result) => ({
                                     path: result.path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                                     body: `\`\`\`suggestion
 ${result.mismatch.expected}\`\`\``,

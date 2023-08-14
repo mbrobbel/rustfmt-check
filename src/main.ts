@@ -106,7 +106,7 @@ async function run(): Promise<void> {
               ...context.repo,
               pull_number: context.issue.number,
               review_id,
-              message: "",
+              message: "Removing outdated review.",
             });
           } else {
             core.debug(`No existing reviews found.`);
@@ -128,7 +128,7 @@ async function run(): Promise<void> {
             await octokit.rest.pulls.createReview({
               ...context.repo,
               pull_number: context.issue.number,
-              body: `Please format your code using rustfmt`,
+              body: `Please format your code using [rustfmt](https://github.com/rust-lang/rustfmt): \`cargo fmt\``,
               event: "REQUEST_CHANGES",
               comments: output.map((result) => ({
                 path: result.path.replace(
