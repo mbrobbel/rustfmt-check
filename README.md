@@ -2,7 +2,21 @@
 
 GitHub Action to format [Rust] code using [rustfmt].
 
-This action can be used to keep [Rust] code formatted correctly. A commit is pushed when formatting is required.
+This action can be used to keep [Rust] code formatted correctly.
+
+## Modes
+
+This action supports two different modes.
+
+### Commit
+
+A commit is pushed when formatting is required.
+
+### Review
+
+The action reviews the PR, either requestig formatting changes, or approving if no formatting is required.
+
+Please note that this mode requires [allowing GitHub Actions to create or approve pull reqeuests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 
 ## Arguments
 
