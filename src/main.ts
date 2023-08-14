@@ -80,6 +80,19 @@ async function run(): Promise<void> {
             .reverse()
             .find(({ user }) => user?.name === "github-actions[bot]")?.id;
           if (review_id !== undefined) {
+            // Delete outdated comments
+            const review_comments = await octokit.rest.pulls.listCommentsForReview({
+              ...context.repo,
+              pull_number: context.issue.number,
+              review_id,
+            });
+            await Promise.all(review_comments.data.map(({ id }) => {
+              octokit.rest.pulls.deleteReviewComment({
+                ...context.repo,
+                comment_id: id
+              })
+            }));
+            // Dismiss review
             await octokit.rest.pulls.dismissReview({
               ...context.repo,
               pull_number: context.issue.number,
