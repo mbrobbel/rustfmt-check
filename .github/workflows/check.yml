@@ -39,6 +39,9 @@ jobs:
           node-version: "16"
       - run: npm ci --ignore-scripts
       - run: npm run build
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
       - run: npm test
 
   format:
