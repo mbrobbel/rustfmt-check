@@ -161,11 +161,11 @@ function run() {
                         if (!context.payload.pull_request) {
                             throw new Error("Review mode requires a pull_request event trigger");
                         }
-                        // Dismiss exisiting reviews
+                        // Dismiss exisiting (open) reviews
                         const reviews = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number }));
                         const review_id = (_a = reviews.data
                             .reverse()
-                            .find(({ user }) => (user === null || user === void 0 ? void 0 : user.id) === 41898282)) === null || _a === void 0 ? void 0 : _a.id;
+                            .find(({ user, state }) => ((user === null || user === void 0 ? void 0 : user.id) === 41898282 && state === "CHANGES_REQUESTED"))) === null || _a === void 0 ? void 0 : _a.id;
                         if (review_id !== undefined) {
                             core.info(`Removing review: ${review_id}.`);
                             // Delete outdated comments
@@ -176,7 +176,7 @@ function run() {
                             }));
                             // Dismiss review
                             core.info(`Dismiss review: ${review_id}.`);
-                            yield octokit.rest.pulls.dismissReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id, message: "Updating review" }));
+                            yield octokit.rest.pulls.dismissReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id, message: "" }));
                         }
                         else {
                             core.info(`No existing reviews found.`);

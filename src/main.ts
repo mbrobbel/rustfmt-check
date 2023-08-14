@@ -71,14 +71,17 @@ async function run(): Promise<void> {
               "Review mode requires a pull_request event trigger",
             );
           }
-          // Dismiss exisiting reviews
+          // Dismiss exisiting (open) reviews
           const reviews = await octokit.rest.pulls.listReviews({
             ...context.repo,
             pull_number: context.issue.number,
           });
           const review_id = reviews.data
             .reverse()
-            .find(({ user }) => user?.id === 41898282)?.id;
+            .find(
+              ({ user, state }) =>
+                user?.id === 41898282 && state === "CHANGES_REQUESTED",
+            )?.id;
           if (review_id !== undefined) {
             core.info(`Removing review: ${review_id}.`);
             // Delete outdated comments
@@ -103,7 +106,7 @@ async function run(): Promise<void> {
               ...context.repo,
               pull_number: context.issue.number,
               review_id,
-              message: "Updating review",
+              message: "",
             });
           } else {
             core.info(`No existing reviews found.`);
