@@ -117,6 +117,7 @@ const check_1 = __importDefault(__nccwpck_require__(7657));
 const rustfmt_1 = __importDefault(__nccwpck_require__(6686));
 const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput("token", { required: true });
@@ -160,12 +161,22 @@ function run() {
                         if (!context.payload.pull_request) {
                             throw new Error("Review mode requires a pull_request event trigger");
                         }
+                        // Dismiss exisiting reviews
+                        const reviews = yield octokit.rest.pulls.listReviews(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number }));
+                        const review_id = (_a = reviews.data.reverse().find(({ user }) => (user === null || user === void 0 ? void 0 : user.name) === "github-actions[bot]")) === null || _a === void 0 ? void 0 : _a.id;
+                        if (review_id !== undefined) {
+                            yield octokit.rest.pulls.dismissReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, review_id, message: "" }));
+                        }
+                        // Check current state
                         const output = yield (0, check_1.default)();
                         if (output.length === 0) {
+                            // Approve
+                            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, event: "APPROVE" }));
                             Promise.resolve();
                         }
                         else {
-                            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using rustfmt`, event: "COMMENT", comments: output.map((result) => ({
+                            // Request changes
+                            yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using rustfmt`, event: "REQUEST_CHANGES", comments: output.map((result) => ({
                                     path: result.path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                                     body: `\`\`\`suggestion
 ${result.mismatch.expected}\`\`\``,

@@ -71,15 +71,39 @@ async function run(): Promise<void> {
               "Review mode requires a pull_request event trigger",
             );
           }
+          // Dismiss exisiting reviews
+          const reviews = await octokit.rest.pulls.listReviews({
+            ...context.repo,
+            pull_number: context.issue.number,
+          });
+          const review_id = reviews.data
+            .reverse()
+            .find(({ user }) => user?.name === "github-actions[bot]")?.id;
+          if (review_id !== undefined) {
+            await octokit.rest.pulls.dismissReview({
+              ...context.repo,
+              pull_number: context.issue.number,
+              review_id,
+              message: "",
+            });
+          }
+          // Check current state
           const output = await check();
           if (output.length === 0) {
+            // Approve
+            await octokit.rest.pulls.createReview({
+              ...context.repo,
+              pull_number: context.issue.number,
+              event: "APPROVE",
+            });
             Promise.resolve();
           } else {
+            // Request changes
             await octokit.rest.pulls.createReview({
               ...context.repo,
               pull_number: context.issue.number,
               body: `Please format your code using rustfmt`,
-              event: "COMMENT", // or request_changes and then approve if fixed (check if review outstanding etc)
+              event: "REQUEST_CHANGES",
               comments: output.map((result) => ({
                 path: result.path.replace(
                   `${process.env.GITHUB_WORKSPACE}/`,
