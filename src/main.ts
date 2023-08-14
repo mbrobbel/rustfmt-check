@@ -78,7 +78,7 @@ async function run(): Promise<void> {
           });
           const review_id = reviews.data
             .reverse()
-            .find(({ user }) => user?.name === "github-actions[bot]")?.id;
+            .find(({ user }) => user?.login === "github-actions[bot]")?.id;
           if (review_id !== undefined) {
             // Delete outdated comments
             const review_comments = await octokit.rest.pulls.listCommentsForReview({
