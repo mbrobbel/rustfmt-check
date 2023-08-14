@@ -34,28 +34,28 @@ test("rustfmt check output lists files to be formatted", async () => {
     expect.arrayContaining([
       expect.stringContaining("__tests__/needs-formatting/src/main.rs"),
       expect.stringContaining("__tests__/needs-formatting/src/lib.rs"),
-    ])
+    ]),
   );
 });
 
 test("rustfmt check mode outputs lists of changes", async () => {
   const output = await check(
-    "--manifest-path __tests__/needs-formatting/Cargo.toml"
+    "--manifest-path __tests__/needs-formatting/Cargo.toml",
   );
   expect(output.map((result) => result.path)).toEqual(
     expect.arrayContaining([
       expect.stringContaining("__tests__/needs-formatting/src/main.rs"),
       expect.stringContaining("__tests__/needs-formatting/src/lib.rs"),
-    ])
+    ]),
   );
   expect(
     output
       .map((result) => result.mismatch)
-      .map((mismatch) => mismatch.original_begin_line)
+      .map((mismatch) => mismatch.original_begin_line),
   ).toEqual([1, 1, 8, 10]);
   expect(
     output
       .map((result) => result.mismatch)
-      .map((mismatch) => mismatch.expected_begin_line)
+      .map((mismatch) => mismatch.expected_begin_line),
   ).toEqual([1, 1, 5, 7]);
 });

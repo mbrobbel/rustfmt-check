@@ -22,7 +22,7 @@ interface Mismatch {
 }
 
 const check = async (
-  args: string = core.getInput("args")
+  args: string = core.getInput("args"),
 ): Promise<Result[]> => {
   const result: Result[] = [];
   const add = (data: Buffer): void => {
@@ -41,7 +41,7 @@ const check = async (
       listeners: {
         stdout: add,
       },
-    }
+    },
   );
   return result;
 };
