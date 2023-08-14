@@ -193,7 +193,7 @@ function run() {
                             // Request changes
                             core.debug("Request changes");
                             yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using rustfmt`, event: "REQUEST_CHANGES", comments: output.map((result) => ({
-                                    path: result.path.replace(`${process.env.GITHUB_WORKSPACE} / `, ""),
+                                    path: result.path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                                     body: `\`\`\`suggestion
 ${result.mismatch.expected}\`\`\``,
                                     start_line: result.mismatch.original_end_line ===

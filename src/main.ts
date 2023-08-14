@@ -132,7 +132,7 @@ async function run(): Promise<void> {
               event: "REQUEST_CHANGES",
               comments: output.map((result) => ({
                 path: result.path.replace(
-                  `${process.env.GITHUB_WORKSPACE} / `,
+                  `${process.env.GITHUB_WORKSPACE}/`,
                   "",
                 ),
                 body: `\`\`\`suggestion
