@@ -4,6 +4,7 @@ import { readFile as readFileCallback } from "fs";
 import { promisify } from "util";
 import check from "./check";
 import rustfmt from "./rustfmt";
+import { normalize } from "path";
 
 const readFile = promisify(readFileCallback);
 
@@ -35,9 +36,8 @@ async function run(): Promise<void> {
                     ...context.repo,
                     tree: await Promise.all(
                       paths.map(async (path) => ({
-                        path: path.replace(
-                          `${process.env.GITHUB_WORKSPACE}/`,
-                          "",
+                        path: normalize(
+                          path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
                         ),
                         mode: "100644",
                         type: "blob",
