@@ -115,6 +115,7 @@ const fs_1 = __nccwpck_require__(7147);
 const util_1 = __nccwpck_require__(3837);
 const check_1 = __importDefault(__nccwpck_require__(7657));
 const rustfmt_1 = __importDefault(__nccwpck_require__(6686));
+const path_1 = __nccwpck_require__(1017);
 const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
     var _a;
@@ -141,7 +142,7 @@ function run() {
                                 : octokit.rest.git
                                     .createTree(Object.assign(Object.assign({}, context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
                                         return ({
-                                            path: path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                                            path: (0, path_1.normalize)(path.replace(`${process.env.GITHUB_WORKSPACE}/`, "")),
                                             mode: "100644",
                                             type: "blob",
                                             content: yield readFile(path, "utf8"),
