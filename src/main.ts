@@ -4,7 +4,6 @@ import { readFile as readFileCallback } from "fs";
 import { promisify } from "util";
 import check from "./check";
 import rustfmt from "./rustfmt";
-import { normalize } from "path";
 
 const readFile = promisify(readFileCallback);
 
@@ -36,9 +35,7 @@ async function run(): Promise<void> {
                     ...context.repo,
                     tree: await Promise.all(
                       paths.map(async (path) => ({
-                        path: normalize(
-                          path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
-                        ),
+                        path,
                         mode: "100644",
                         type: "blob",
                         content: await readFile(path, "utf8"),
@@ -131,10 +128,7 @@ async function run(): Promise<void> {
               body: `Please format your code using [rustfmt](https://github.com/rust-lang/rustfmt): \`cargo fmt\``,
               event: "REQUEST_CHANGES",
               comments: output.map((result) => ({
-                path: result.path.replace(
-                  `${process.env.GITHUB_WORKSPACE}/`,
-                  "",
-                ),
+                path: result.path,
                 body: `\`\`\`suggestion
 ${result.mismatch.expected}\`\`\``,
                 start_line:

@@ -45,12 +45,16 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
+const path_1 = __nccwpck_require__(13);
 const check = (args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
     const result = [];
     const add = (data) => {
         JSON.parse(data.toString().trim()).forEach((output) => {
             output.mismatches.forEach((mismatch) => {
-                result.push({ path: output.name, mismatch });
+                result.push({
+                    path: (0, path_1.normalize_path)(output.name),
+                    mismatch,
+                });
             });
         });
     };
@@ -115,7 +119,6 @@ const fs_1 = __nccwpck_require__(7147);
 const util_1 = __nccwpck_require__(3837);
 const check_1 = __importDefault(__nccwpck_require__(7657));
 const rustfmt_1 = __importDefault(__nccwpck_require__(6686));
-const path_1 = __nccwpck_require__(1017);
 const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
     var _a;
@@ -142,7 +145,7 @@ function run() {
                                 : octokit.rest.git
                                     .createTree(Object.assign(Object.assign({}, context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
                                         return ({
-                                            path: (0, path_1.normalize)(path.replace(`${process.env.GITHUB_WORKSPACE}/`, "")),
+                                            path,
                                             mode: "100644",
                                             type: "blob",
                                             content: yield readFile(path, "utf8"),
@@ -194,7 +197,7 @@ function run() {
                             // Request changes
                             core.debug("Request changes");
                             yield octokit.rest.pulls.createReview(Object.assign(Object.assign({}, context.repo), { pull_number: context.issue.number, body: `Please format your code using [rustfmt](https://github.com/rust-lang/rustfmt): \`cargo fmt\``, event: "REQUEST_CHANGES", comments: output.map((result) => ({
-                                    path: result.path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                                    path: result.path,
                                     body: `\`\`\`suggestion
 ${result.mismatch.expected}\`\`\``,
                                     start_line: result.mismatch.original_end_line ===
@@ -220,6 +223,22 @@ ${result.mismatch.expected}\`\`\``,
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 13:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.normalize_path = void 0;
+const path_1 = __nccwpck_require__(1017);
+const normalize_path = (path) => {
+    return (0, path_1.normalize)((0, path_1.relative)(`${process.env.GITHUB_WORKSPACE}`, path)).replace("/\\/g", "/");
+};
+exports.normalize_path = normalize_path;
 
 
 /***/ }),
@@ -268,13 +287,14 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
+const path_1 = __nccwpck_require__(13);
 const rustfmt = (options = [], args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
     const output = [];
     return exec
         .exec("cargo", ["fmt"].concat((0, string_argv_1.default)(args)).concat(["--"]).concat(options), {
         listeners: {
             stdout: (data) => {
-                output.push(data.toString().trim());
+                output.push((0, path_1.normalize_path)(data.toString().trim()));
             },
         },
     })
