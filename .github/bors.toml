@@ -1,6 +1,7 @@
 status = [
   "Pack",
-  "Test",
+  "Test (ubuntu-latest)",
+  "Test (windows-latest)",
   "Format",
   "Lint"
 ]
