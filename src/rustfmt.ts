@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import stringArgv from "string-argv";
+import { normalize_path } from "./path";
 
 const rustfmt = async (
   options: string[] = [],
@@ -14,7 +15,7 @@ const rustfmt = async (
       {
         listeners: {
           stdout: (data: Buffer) => {
-            output.push(data.toString().trim());
+            output.push(normalize_path(data.toString().trim()));
           },
         },
       },

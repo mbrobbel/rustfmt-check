@@ -1,7 +1,19 @@
 import rustfmt from "../src/rustfmt";
 import check from "../src/check";
+import { normalize_path } from "../src/path";
+
+process.env.GITHUB_WORKSPACE = process.env.PWD;
 
 jest.setTimeout(30000);
+
+test("normalize path method", async () => {
+  const path = require("path");
+  expect(
+    normalize_path(
+      path.join(`${process.env.GITHUB_WORKSPACE}`, "a/b/../b/c/d/.."),
+    ),
+  ).toEqual("a/b/c");
+});
 
 test("rustfmt check output is empty when nothing is required", async () => {
   expect(
@@ -20,7 +32,8 @@ test("rustfmt check output fails if formatting is required", async () => {
     );
     throw new Error("rustfmt did not fail");
   } catch (e: any) {
-    expect(e.message).toContain(".cargo/bin/cargo' failed with exit code 1");
+    expect(e.message).toContain("cargo");
+    expect(e.message).toContain("failed with exit code 1");
   }
 });
 

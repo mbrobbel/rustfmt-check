@@ -1,6 +1,7 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import stringArgv from "string-argv";
+import { normalize_path } from "./path";
 
 interface Output {
   name: string;
@@ -28,7 +29,10 @@ const check = async (
   const add = (data: Buffer): void => {
     JSON.parse(data.toString().trim()).forEach((output: Output) => {
       output.mismatches.forEach((mismatch) => {
-        result.push({ path: output.name, mismatch });
+        result.push({
+          path: normalize_path(output.name),
+          mismatch,
+        });
       });
     });
   };
