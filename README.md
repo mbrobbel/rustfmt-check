@@ -48,6 +48,8 @@ name: Rustfmt
 jobs:
   format:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
       - uses: actions/checkout@v3
       - uses: dtolnay/rust-toolchain@nightly
