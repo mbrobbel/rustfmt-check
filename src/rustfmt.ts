@@ -1,12 +1,13 @@
 import * as core from "@actions/core";
 import * as exec from "@actions/exec";
 import stringArgv from "string-argv";
+import { EOL } from "os";
 
 const rustfmt = async (
   options: string[] = [],
   args: string = core.getInput("args"),
 ): Promise<string[]> => {
-  const output: string[] = [];
+  let output = "";
   return exec
     .exec(
       "cargo",
@@ -14,12 +15,12 @@ const rustfmt = async (
       {
         listeners: {
           stdout: (data: Buffer) => {
-            output.push(data.toString().trim());
+            output += data.toString();
           },
         },
       },
     )
-    .then(() => output.filter(Boolean));
+    .then(() => output.trim().split(EOL).filter(Boolean));
 };
 
 export default rustfmt;

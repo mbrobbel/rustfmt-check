@@ -268,17 +268,18 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
+const os_1 = __nccwpck_require__(2037);
 const rustfmt = (options = [], args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
-    const output = [];
+    let output = "";
     return exec
         .exec("cargo", ["fmt"].concat((0, string_argv_1.default)(args)).concat(["--"]).concat(options), {
         listeners: {
             stdout: (data) => {
-                output.push(data.toString().trim());
+                output += data.toString();
             },
         },
     })
-        .then(() => output.filter(Boolean));
+        .then(() => output.trim().split(os_1.EOL).filter(Boolean));
 });
 exports["default"] = rustfmt;
 
