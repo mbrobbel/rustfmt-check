@@ -45,7 +45,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
-const check = (args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
+const check = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (args = core.getInput("args")) {
     const result = [];
     const add = (data) => {
         JSON.parse(data.toString().trim()).forEach((output) => {
@@ -118,8 +118,8 @@ const rustfmt_1 = __importDefault(__nccwpck_require__(6686));
 const path_1 = __nccwpck_require__(1017);
 const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
-    var _a;
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         try {
             const token = core.getInput("token", { required: true });
             const octokit = github.getOctokit(token);
@@ -148,10 +148,10 @@ function run() {
                                             content: yield readFile(path, "utf8"),
                                         });
                                     }))), base_tree: head.sha }))
-                                    .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
+                                    .then((_b) => __awaiter(this, [_b], void 0, function* ({ data: { sha } }) {
                                     return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message, tree: sha, parents: [head.sha] }));
                                 }))
-                                    .then(({ data: { sha } }) => __awaiter(this, void 0, void 0, function* () {
+                                    .then((_c) => __awaiter(this, [_c], void 0, function* ({ data: { sha } }) {
                                     return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: head.ref.replace("refs/", ""), sha }));
                                 }));
                         }));
@@ -269,7 +269,7 @@ const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
 const os_1 = __nccwpck_require__(2037);
-const rustfmt = (options = [], args = core.getInput("args")) => __awaiter(void 0, void 0, void 0, function* () {
+const rustfmt = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (options = [], args = core.getInput("args")) {
     let output = "";
     return exec
         .exec("cargo", ["fmt"].concat((0, string_argv_1.default)(args)).concat(["--"]).concat(options), {
