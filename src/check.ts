@@ -24,26 +24,29 @@ interface Mismatch {
 const check = async (
   args: string = core.getInput("args"),
 ): Promise<Result[]> => {
-  const result: Result[] = [];
-  const add = (data: Buffer): void => {
-    JSON.parse(data.toString().trim()).forEach((output: Output) => {
-      output.mismatches.forEach((mismatch) => {
-        result.push({ path: output.name, mismatch });
-      });
-    });
-  };
-  await exec.exec(
-    "cargo",
-    ["+nightly", "fmt"]
-      .concat(stringArgv(args))
-      .concat(["--", "--emit", "json"]),
-    {
-      listeners: {
-        stdout: add,
+  let buffer = "";
+  return exec
+    .exec(
+      "cargo",
+      ["+nightly", "fmt"]
+        .concat(stringArgv(args))
+        .concat(["--", "--emit", "json"]),
+      {
+        listeners: {
+          stdout: (data: Buffer) => {
+            buffer += data.toString().trim();
+          },
+        },
       },
-    },
-  );
-  return result;
+    )
+    .then(() =>
+      JSON.parse(buffer).flatMap((output: Output) =>
+        output.mismatches.map((mismatch) => ({
+          path: output.name,
+          mismatch,
+        })),
+      ),
+    );
 };
 
 export default check;

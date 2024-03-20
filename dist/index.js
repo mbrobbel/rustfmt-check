@@ -46,22 +46,21 @@ const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
 const check = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (args = core.getInput("args")) {
-    const result = [];
-    const add = (data) => {
-        JSON.parse(data.toString().trim()).forEach((output) => {
-            output.mismatches.forEach((mismatch) => {
-                result.push({ path: output.name, mismatch });
-            });
-        });
-    };
-    yield exec.exec("cargo", ["+nightly", "fmt"]
+    let buffer = "";
+    return exec
+        .exec("cargo", ["+nightly", "fmt"]
         .concat((0, string_argv_1.default)(args))
         .concat(["--", "--emit", "json"]), {
         listeners: {
-            stdout: add,
+            stdout: (data) => {
+                buffer += data.toString().trim();
+            },
         },
-    });
-    return result;
+    })
+        .then(() => JSON.parse(buffer).flatMap((output) => output.mismatches.map((mismatch) => ({
+        path: output.name,
+        mismatch,
+    }))));
 });
 exports["default"] = check;
 
