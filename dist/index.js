@@ -147,10 +147,10 @@ function run() {
                                             content: yield readFile(path, "utf8"),
                                         });
                                     }))), base_tree: head.sha }))
-                                    .then((_b) => __awaiter(this, [_b], void 0, function* ({ data: { sha } }) {
+                                    .then((_a) => __awaiter(this, [_a], void 0, function* ({ data: { sha } }) {
                                     return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message, tree: sha, parents: [head.sha] }));
                                 }))
-                                    .then((_c) => __awaiter(this, [_c], void 0, function* ({ data: { sha } }) {
+                                    .then((_a) => __awaiter(this, [_a], void 0, function* ({ data: { sha } }) {
                                     return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: head.ref.replace("refs/", ""), sha }));
                                 }));
                         }));
