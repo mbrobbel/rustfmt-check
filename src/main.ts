@@ -163,6 +163,7 @@ ${result.mismatch.expected}\`\`\``,
                   ref: `refs/heads/${context.payload.pull_request.head.ref}`,
                 }
               : { sha: context.sha, ref: context.ref };
+          const ref = `refs/heads/rustfmt-${head.sha}`;
           await rustfmt(["-l"]).then(async (paths) =>
             paths.length === 0
               ? // No formatting required
@@ -170,7 +171,7 @@ ${result.mismatch.expected}\`\`\``,
               : octokit.rest.git
                   .createRef({
                     ...context.repo,
-                    ref: `refs/heads/rustfmt-${head.sha}`,
+                    ref,
                     sha: head.sha,
                   })
                   .then(async () =>
@@ -203,7 +204,7 @@ ${result.mismatch.expected}\`\`\``,
                       .then(async ({ data: { sha } }) =>
                         octokit.rest.git.updateRef({
                           ...context.repo,
-                          ref: `refs/heads/rustfmt-${head.sha}`,
+                          ref,
                           sha,
                         }),
                       ),
