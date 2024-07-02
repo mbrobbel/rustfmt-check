@@ -170,7 +170,7 @@ ${result.mismatch.expected}\`\`\``,
               : octokit.rest.git
                   .createRef({
                     ...context.repo,
-                    ref: `refs/heads/rustfmt-${context.sha}`,
+                    ref: `refs/heads/rustfmt-${head.sha}`,
                     sha: head.sha,
                   })
                   .then(async () =>
@@ -203,7 +203,7 @@ ${result.mismatch.expected}\`\`\``,
                       .then(async ({ data: { sha } }) =>
                         octokit.rest.git.updateRef({
                           ...context.repo,
-                          ref: `refs/heads/rustfmt-${context.sha}`,
+                          ref: `refs/heads/rustfmt-${head.sha}`,
                           sha,
                         }),
                       ),
