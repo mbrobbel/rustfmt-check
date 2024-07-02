@@ -218,12 +218,13 @@ ${result.mismatch.expected}\`\`\``,
                                 ref: `refs/heads/${context.payload.pull_request.head.ref}`,
                             }
                             : { sha: context.sha, ref: context.ref };
+                        const ref = `refs/heads/rustfmt-${head.sha}`;
                         yield (0, rustfmt_1.default)(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
                             return paths.length === 0
                                 ? // No formatting required
                                     Promise.resolve()
                                 : octokit.rest.git
-                                    .createRef(Object.assign(Object.assign({}, context.repo), { ref: `refs/heads/rustfmt-${context.sha}`, sha: head.sha }))
+                                    .createRef(Object.assign(Object.assign({}, context.repo), { ref, sha: head.sha }))
                                     .then(() => __awaiter(this, void 0, void 0, function* () {
                                     return octokit.rest.git
                                         .createTree(Object.assign(Object.assign({}, context.repo), { tree: yield Promise.all(paths.map((path) => __awaiter(this, void 0, void 0, function* () {
@@ -238,7 +239,8 @@ ${result.mismatch.expected}\`\`\``,
                                         return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message, tree: sha, parents: [head.sha] }));
                                     }))
                                         .then((_a) => __awaiter(this, [_a], void 0, function* ({ data: { sha } }) {
-                                        return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: `refs/heads/rustfmt-${context.sha}`, sha }));
+                                        return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref,
+                                            sha }));
                                     }));
                                 }));
                         }));
