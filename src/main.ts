@@ -154,6 +154,7 @@ ${result.mismatch.expected}\`\`\``,
         }
         break;
       case "pull":
+        // Open a pull request from a new branch with the formatted code
         {
           const head =
             context.eventName === "pull_request" && context.payload.pull_request
@@ -162,40 +163,50 @@ ${result.mismatch.expected}\`\`\``,
                   ref: `refs/heads/${context.payload.pull_request.head.ref}`,
                 }
               : { sha: context.sha, ref: context.ref };
-
           await rustfmt(["-l"]).then(async (paths) =>
             paths.length === 0
               ? // No formatting required
                 Promise.resolve()
               : octokit.rest.git
-                  .createTree({
+                  .createRef({
                     ...context.repo,
-                    tree: await Promise.all(
-                      paths.map(async (path) => ({
-                        path: normalize(
-                          path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
-                        ),
-                        mode: "100644",
-                        type: "blob",
-                        content: await readFile(path, "utf8"),
-                      })),
-                    ),
-                    base_tree: head.sha,
+                    ref: `refs/heads/rustfmt-${context.sha}`,
+                    sha: head.sha,
                   })
-                  .then(async ({ data: { sha } }) =>
-                    octokit.rest.git.createCommit({
-                      ...context.repo,
-                      message,
-                      tree: sha,
-                      parents: [head.sha],
-                    }),
-                  )
-                  .then(async ({ data: { sha } }) =>
-                    octokit.rest.git.updateRef({
-                      ...context.repo,
-                      ref: head.ref.replace("refs/", ""),
-                      sha,
-                    }),
+                  .then(async () =>
+                    octokit.rest.git
+                      .createTree({
+                        ...context.repo,
+                        tree: await Promise.all(
+                          paths.map(async (path) => ({
+                            path: normalize(
+                              path.replace(
+                                `${process.env.GITHUB_WORKSPACE}/`,
+                                "",
+                              ),
+                            ),
+                            mode: "100644",
+                            type: "blob",
+                            content: await readFile(path, "utf8"),
+                          })),
+                        ),
+                        base_tree: head.sha,
+                      })
+                      .then(async ({ data: { sha } }) =>
+                        octokit.rest.git.createCommit({
+                          ...context.repo,
+                          message,
+                          tree: sha,
+                          parents: [head.sha],
+                        }),
+                      )
+                      .then(async ({ data: { sha } }) =>
+                        octokit.rest.git.updateRef({
+                          ...context.repo,
+                          ref: `refs/heads/rustfmt-${context.sha}`,
+                          sha,
+                        }),
+                      ),
                   ),
           );
         }
