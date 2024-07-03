@@ -6,7 +6,7 @@ This action can be used to keep [Rust] code formatted correctly.
 
 ## Modes
 
-This action supports two different modes. The `commit` mode is the default mode.
+This action supports three different modes. The `commit` mode is the default mode.
 
 ### Commit
 
@@ -71,12 +71,6 @@ Please note that this mode requires:
 
 The action creates a pull request with the formatting changes.
 
-> ![WARNING]
-> You have to enable handling pull requests for GitHub Actions in the repository settings.
->
-> `https://github.com/<owner>/<repo>/settings/actions`
-> ![a screenshot of the GitHub repository settings](images/permissions.png)
-
 #### Example
 
 ```
@@ -90,7 +84,7 @@ jobs:
     permissions: write-all
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@nightly
+      - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
       - uses: mbrobbel/rustfmt-check@master
@@ -98,6 +92,9 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           mode: pull
 ```
+
+Please note that this mode requires:
+- [Allowing GitHub Actions to create or approve pull reqeuests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 
 ## Arguments
 
