@@ -211,14 +211,12 @@ ${result.mismatch.expected}\`\`\``,
                       .then(async (_) => {
                         _;
                         const title = `Format code using rustfmt for ${head.sha}`;
-                        const body = `
-                          The code for commit \`${head.sha}\` on \`${head.ref.replace("refs/heads/", "")}\` has been formatted automatically using [rustfmt](https://github.com/rust-lang/rustfmt).
-                          Please review the changes and merge if everything looks good.
+                        const body = `The code for commit \`${head.sha}\` on \`${head.ref.replace("refs/heads/", "")}\` has been formatted automatically using [rustfmt](https://github.com/rust-lang/rustfmt).
+Please review the changes and merge if everything looks good.
 
-                          ---
+---
 
-                          Delete the \`${ref.replace("refs/heads/", "")}\` branch after merging or closing the pull request.
-                        `;
+Delete the \`${ref.replace("refs/heads/", "")}\` branch after merging or closing the pull request.`;
                         return octokit.rest.pulls.create({
                           ...context.repo,
                           title,

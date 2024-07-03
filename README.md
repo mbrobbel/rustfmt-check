@@ -67,6 +67,38 @@ Please note that this mode requires:
 - A nightly Rust toolchain
 - [Allowing GitHub Actions to create or approve pull reqeuests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 
+### Pull request
+
+The action creates a pull request with the formatting changes.
+
+> ![WARNING]
+> You have to enable handling pull requests for GitHub Actions in the repository settings.
+>
+> `https://github.com/<owner>/<repo>/settings/actions`
+> ![a screenshot of the GitHub repository settings](images/permissions.png)
+
+#### Example
+
+```
+on: pull_request
+
+name: Rustfmt
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - uses: mbrobbel/rustfmt-check@master
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          mode: pull
+```
+
 ## Arguments
 
 See [action.yml](./action.yml).
