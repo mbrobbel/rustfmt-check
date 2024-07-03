@@ -240,6 +240,19 @@ ${result.mismatch.expected}\`\`\``,
                                     }))
                                         .then((_a) => __awaiter(this, [_a], void 0, function* ({ data: { sha } }) {
                                         return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: ref.replace("refs/", ""), sha }));
+                                    }))
+                                        .then((_) => __awaiter(this, void 0, void 0, function* () {
+                                        _;
+                                        const title = `Format code using rustfmt for ${head.sha}`;
+                                        const body = `
+                          The code for commit \`${head.sha}\` on \`${head.ref.replace("refs/heads/", "")}\` has been formatted automatically using [rustfmt](https://github.com/rust-lang/rustfmt).
+                          Please review the changes and merge if everything looks good.
+
+                          ---
+
+                          Delete the \`${ref.replace("refs/heads/", "")}\` branch after merging or closing the pull request.
+                        `;
+                                        return octokit.rest.pulls.create(Object.assign(Object.assign({}, context.repo), { title, head: ref.replace("refs/heads/", ""), base: head.ref.replace("refs/heads/", ""), body }));
                                     }));
                                 }));
                         }));
