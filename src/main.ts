@@ -204,7 +204,7 @@ ${result.mismatch.expected}\`\`\``,
                       .then(async ({ data: { sha } }) =>
                         octokit.rest.git.updateRef({
                           ...context.repo,
-                          ref,
+                          ref: ref.replace("refs/", ""),
                           sha,
                         }),
                       ),

@@ -239,8 +239,7 @@ ${result.mismatch.expected}\`\`\``,
                                         return octokit.rest.git.createCommit(Object.assign(Object.assign({}, context.repo), { message, tree: sha, parents: [head.sha] }));
                                     }))
                                         .then((_a) => __awaiter(this, [_a], void 0, function* ({ data: { sha } }) {
-                                        return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref,
-                                            sha }));
+                                        return octokit.rest.git.updateRef(Object.assign(Object.assign({}, context.repo), { ref: ref.replace("refs/", ""), sha }));
                                     }));
                                 }));
                         }));
