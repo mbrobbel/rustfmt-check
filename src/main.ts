@@ -207,7 +207,26 @@ ${result.mismatch.expected}\`\`\``,
                           ref: ref.replace("refs/", ""),
                           sha,
                         }),
-                      ),
+                      )
+                      .then(async (_) => {
+                        _;
+                        const title = `Format code using rustfmt for ${head.ref}`;
+                        const body = `
+                          The code has been formatted automatically using rustfmt.
+                          Please review the changes and merge if everything looks good.
+
+                          ---
+
+                          Please delete the branch after merging or closing the pull request.
+                        `;
+                        return octokit.rest.pulls.create({
+                          ...context.repo,
+                          title,
+                          head: ref.replace("refs/heads/", ""),
+                          base: head.ref.replace("refs/heads/", ""),
+                          body,
+                        });
+                      }),
                   ),
           );
         }
