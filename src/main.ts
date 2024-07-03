@@ -153,6 +153,82 @@ ${result.mismatch.expected}\`\`\``,
           }
         }
         break;
+      case "pull":
+        // Open a pull request from a new branch with the formatted code
+        {
+          const head =
+            context.eventName === "pull_request" && context.payload.pull_request
+              ? {
+                  sha: context.payload.pull_request.head.sha,
+                  ref: `refs/heads/${context.payload.pull_request.head.ref}`,
+                }
+              : { sha: context.sha, ref: context.ref };
+          const ref = `refs/heads/rustfmt-${head.sha}`;
+          await rustfmt(["-l"]).then(async (paths) =>
+            paths.length === 0
+              ? // No formatting required
+                Promise.resolve()
+              : octokit.rest.git
+                  .createRef({
+                    ...context.repo,
+                    ref,
+                    sha: head.sha,
+                  })
+                  .then(async () =>
+                    octokit.rest.git
+                      .createTree({
+                        ...context.repo,
+                        tree: await Promise.all(
+                          paths.map(async (path) => ({
+                            path: normalize(
+                              path.replace(
+                                `${process.env.GITHUB_WORKSPACE}/`,
+                                "",
+                              ),
+                            ),
+                            mode: "100644",
+                            type: "blob",
+                            content: await readFile(path, "utf8"),
+                          })),
+                        ),
+                        base_tree: head.sha,
+                      })
+                      .then(async ({ data: { sha } }) =>
+                        octokit.rest.git.createCommit({
+                          ...context.repo,
+                          message,
+                          tree: sha,
+                          parents: [head.sha],
+                        }),
+                      )
+                      .then(async ({ data: { sha } }) =>
+                        octokit.rest.git.updateRef({
+                          ...context.repo,
+                          ref: ref.replace("refs/", ""),
+                          sha,
+                        }),
+                      )
+                      .then(async (_) => {
+                        _;
+                        const title = `Format code using rustfmt for ${head.sha}`;
+                        const body = `The code for commit \`${head.sha}\` on \`${head.ref.replace("refs/heads/", "")}\` has been formatted automatically using [rustfmt](https://github.com/rust-lang/rustfmt).
+Please review the changes and merge if everything looks good.
+
+---
+
+Delete the \`${ref.replace("refs/heads/", "")}\` branch after merging or closing the pull request.`;
+                        return octokit.rest.pulls.create({
+                          ...context.repo,
+                          title,
+                          head: ref.replace("refs/heads/", ""),
+                          base: head.ref.replace("refs/heads/", ""),
+                          body,
+                        });
+                      }),
+                  ),
+          );
+        }
+        break;
       default:
         throw new Error(`Unsupported mode: ${mode}`);
     }

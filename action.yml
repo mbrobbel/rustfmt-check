@@ -13,7 +13,7 @@ inputs:
     description: Arguments for cargo. Not for rustfmt options.
     required: false
   mode:
-    description: Output mode (commit or review)
+    description: Output mode (commit, review or pull)
     default: commit
     required: false
   commit-message:
