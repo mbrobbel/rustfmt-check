@@ -38,6 +38,18 @@ test("rustfmt check output lists files to be formatted", async () => {
   );
 });
 
+test("rustfmt check set config", async () => {
+  expect(
+    await rustfmt(
+      ["-l", "--emit", "stdout"].concat([
+        "--config",
+        "disable_all_formatting=true",
+      ]),
+      "--manifest-path __tests__/needs-formatting/Cargo.toml",
+    ),
+  ).toEqual([]);
+});
+
 test("rustfmt check mode outputs lists of changes", async () => {
   const output = await check(
     "--manifest-path __tests__/needs-formatting/Cargo.toml",

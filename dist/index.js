@@ -45,12 +45,12 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const exec = __importStar(__nccwpck_require__(1514));
 const string_argv_1 = __importDefault(__nccwpck_require__(9663));
-const check = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (args = core.getInput("args")) {
+const check = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (args = core.getInput("args"), rustfmt_args = core.getInput("rustfmt-args")) {
     let buffer = "";
     return exec
         .exec("cargo", ["+nightly", "fmt"]
         .concat((0, string_argv_1.default)(args))
-        .concat(["--", "--emit", "json"]), {
+        .concat(["--", "--emit", "json"].concat((0, string_argv_1.default)(rustfmt_args))), {
         listeners: {
             stdout: (data) => {
                 buffer += data.toString().trim();
@@ -110,11 +110,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
-const fs_1 = __nccwpck_require__(7147);
-const util_1 = __nccwpck_require__(3837);
 const check_1 = __importDefault(__nccwpck_require__(7657));
 const rustfmt_1 = __importDefault(__nccwpck_require__(6686));
+const string_argv_1 = __importDefault(__nccwpck_require__(9663));
 const path_1 = __nccwpck_require__(1017);
+const util_1 = __nccwpck_require__(3837);
+const fs_1 = __nccwpck_require__(7147);
 const readFile = (0, util_1.promisify)(fs_1.readFile);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -123,8 +124,9 @@ function run() {
             const token = core.getInput("token", { required: true });
             const octokit = github.getOctokit(token);
             const context = github.context;
-            const mode = core.getInput("mode", { required: false });
-            const message = core.getInput("commit-message", { required: false });
+            const mode = core.getInput("mode");
+            const rustfmt_args = (0, string_argv_1.default)(core.getInput("rustfmt-args"));
+            const message = core.getInput("commit-message");
             switch (mode) {
                 case "commit":
                     {
@@ -134,7 +136,7 @@ function run() {
                                 ref: `refs/heads/${context.payload.pull_request.head.ref}`,
                             }
                             : { sha: context.sha, ref: context.ref };
-                        yield (0, rustfmt_1.default)(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
+                        yield (0, rustfmt_1.default)(["-l"].concat(rustfmt_args)).then((paths) => __awaiter(this, void 0, void 0, function* () {
                             return paths.length === 0
                                 ? // No formatting required
                                     Promise.resolve()
@@ -219,7 +221,7 @@ ${result.mismatch.expected}\`\`\``,
                             }
                             : { sha: context.sha, ref: context.ref };
                         const ref = `refs/heads/rustfmt-${head.sha}`;
-                        yield (0, rustfmt_1.default)(["-l"]).then((paths) => __awaiter(this, void 0, void 0, function* () {
+                        yield (0, rustfmt_1.default)(["-l"].concat(rustfmt_args)).then((paths) => __awaiter(this, void 0, void 0, function* () {
                             return paths.length === 0
                                 ? // No formatting required
                                     Promise.resolve()

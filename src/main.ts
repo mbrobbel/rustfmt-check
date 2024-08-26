@@ -1,10 +1,11 @@
 import * as core from "@actions/core";
 import * as github from "@actions/github";
-import { readFile as readFileCallback } from "fs";
-import { promisify } from "util";
 import check from "./check";
 import rustfmt from "./rustfmt";
+import stringArgv from "string-argv";
 import { normalize } from "path";
+import { promisify } from "util";
+import { readFile as readFileCallback } from "fs";
 
 const readFile = promisify(readFileCallback);
 
@@ -13,8 +14,9 @@ async function run(): Promise<void> {
     const token = core.getInput("token", { required: true });
     const octokit = github.getOctokit(token);
     const context = github.context;
-    const mode = core.getInput("mode", { required: false });
-    const message = core.getInput("commit-message", { required: false });
+    const mode = core.getInput("mode");
+    const rustfmt_args = stringArgv(core.getInput("rustfmt-args"));
+    const message = core.getInput("commit-message");
 
     switch (mode) {
       case "commit":
@@ -27,7 +29,7 @@ async function run(): Promise<void> {
                 }
               : { sha: context.sha, ref: context.ref };
 
-          await rustfmt(["-l"]).then(async (paths) =>
+          await rustfmt(["-l"].concat(rustfmt_args)).then(async (paths) =>
             paths.length === 0
               ? // No formatting required
                 Promise.resolve()
@@ -164,7 +166,7 @@ ${result.mismatch.expected}\`\`\``,
                 }
               : { sha: context.sha, ref: context.ref };
           const ref = `refs/heads/rustfmt-${head.sha}`;
-          await rustfmt(["-l"]).then(async (paths) =>
+          await rustfmt(["-l"].concat(rustfmt_args)).then(async (paths) =>
             paths.length === 0
               ? // No formatting required
                 Promise.resolve()

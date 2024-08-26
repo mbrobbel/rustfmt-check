@@ -10,7 +10,10 @@ inputs:
     description: GitHub token
     required: true
   args:
-    description: Arguments for cargo. Not for rustfmt options.
+    description: Arguments for cargo.
+    required: false
+  rustfmt-args:
+    description: Arguments for rustfmt.
     required: false
   mode:
     description: Output mode (commit, review or pull)

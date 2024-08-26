@@ -23,6 +23,7 @@ interface Mismatch {
 
 const check = async (
   args: string = core.getInput("args"),
+  rustfmt_args: string = core.getInput("rustfmt-args"),
 ): Promise<Result[]> => {
   let buffer = "";
   return exec
@@ -30,7 +31,7 @@ const check = async (
       "cargo",
       ["+nightly", "fmt"]
         .concat(stringArgv(args))
-        .concat(["--", "--emit", "json"]),
+        .concat(["--", "--emit", "json"].concat(stringArgv(rustfmt_args))),
       {
         listeners: {
           stdout: (data: Buffer) => {
