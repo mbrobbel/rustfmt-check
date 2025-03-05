@@ -1,35 +1,35 @@
-import * as core from "@actions/core";
-import * as github from "@actions/github";
-import check from "./check";
-import rustfmt from "./rustfmt";
-import stringArgv from "string-argv";
-import { normalize } from "path";
-import { promisify } from "util";
-import { readFile as readFileCallback } from "fs";
+import * as core from '@actions/core'
+import * as github from '@actions/github'
+import check from './check'
+import rustfmt from './rustfmt'
+import stringArgv from 'string-argv'
+import { normalize } from 'path'
+import { promisify } from 'util'
+import { readFile as readFileCallback } from 'fs'
 
-const readFile = promisify(readFileCallback);
+const readFile = promisify(readFileCallback)
 
 async function run(): Promise<void> {
   try {
-    const token = core.getInput("token", { required: true });
-    const octokit = github.getOctokit(token);
-    const context = github.context;
-    const mode = core.getInput("mode");
-    const rustfmt_args = stringArgv(core.getInput("rustfmt-args"));
-    const message = core.getInput("commit-message");
+    const token = core.getInput('token', { required: true })
+    const octokit = github.getOctokit(token)
+    const context = github.context
+    const mode = core.getInput('mode')
+    const rustfmt_args = stringArgv(core.getInput('rustfmt-args'))
+    const message = core.getInput('commit-message')
 
     switch (mode) {
-      case "commit":
+      case 'commit':
         {
           const head =
-            context.eventName === "pull_request" && context.payload.pull_request
+            context.eventName === 'pull_request' && context.payload.pull_request
               ? {
                   sha: context.payload.pull_request.head.sha,
-                  ref: `refs/heads/${context.payload.pull_request.head.ref}`,
+                  ref: `refs/heads/${context.payload.pull_request.head.ref}`
                 }
-              : { sha: context.sha, ref: context.ref };
+              : { sha: context.sha, ref: context.ref }
 
-          await rustfmt(["-l"].concat(rustfmt_args)).then(async (paths) =>
+          await rustfmt(['-l'].concat(rustfmt_args)).then(async (paths) =>
             paths.length === 0
               ? // No formatting required
                 Promise.resolve()
@@ -39,103 +39,101 @@ async function run(): Promise<void> {
                     tree: await Promise.all(
                       paths.map(async (path) => ({
                         path: normalize(
-                          path.replace(`${process.env.GITHUB_WORKSPACE}/`, ""),
+                          path.replace(`${process.env.GITHUB_WORKSPACE}/`, '')
                         ),
-                        mode: "100644",
-                        type: "blob",
-                        content: await readFile(path, "utf8"),
-                      })),
+                        mode: '100644',
+                        type: 'blob',
+                        content: await readFile(path, 'utf8')
+                      }))
                     ),
-                    base_tree: head.sha,
+                    base_tree: head.sha
                   })
                   .then(async ({ data: { sha } }) =>
                     octokit.rest.git.createCommit({
                       ...context.repo,
                       message,
                       tree: sha,
-                      parents: [head.sha],
-                    }),
+                      parents: [head.sha]
+                    })
                   )
                   .then(async ({ data: { sha } }) =>
                     octokit.rest.git.updateRef({
                       ...context.repo,
-                      ref: head.ref.replace("refs/", ""),
-                      sha,
-                    }),
-                  ),
-          );
+                      ref: head.ref.replace('refs/', ''),
+                      sha
+                    })
+                  )
+          )
         }
-        break;
-      case "review":
+        break
+      case 'review':
         {
           if (!context.payload.pull_request) {
-            throw new Error(
-              "Review mode requires a pull_request event trigger",
-            );
+            throw new Error('Review mode requires a pull_request event trigger')
           }
           // Dismiss exisiting (open) reviews
           const reviews = await octokit.rest.pulls.listReviews({
             ...context.repo,
-            pull_number: context.issue.number,
-          });
+            pull_number: context.issue.number
+          })
           const review_id = reviews.data
             .reverse()
             .find(
               ({ user, state }) =>
-                user?.id === 41898282 && state === "CHANGES_REQUESTED",
-            )?.id;
+                user?.id === 41898282 && state === 'CHANGES_REQUESTED'
+            )?.id
           if (review_id !== undefined) {
-            core.debug(`Removing review: ${review_id}.`);
+            core.debug(`Removing review: ${review_id}.`)
             // Delete outdated comments
             const review_comments =
               await octokit.rest.pulls.listCommentsForReview({
                 ...context.repo,
                 pull_number: context.issue.number,
-                review_id,
-              });
+                review_id
+              })
             await Promise.all(
               review_comments.data.map(({ id }) => {
-                core.debug(`Removing review comment: ${id}.`);
+                core.debug(`Removing review comment: ${id}.`)
                 octokit.rest.pulls.deleteReviewComment({
                   ...context.repo,
-                  comment_id: id,
-                });
-              }),
-            );
+                  comment_id: id
+                })
+              })
+            )
             // Dismiss review
-            core.debug(`Dismiss review: ${review_id}.`);
+            core.debug(`Dismiss review: ${review_id}.`)
             await octokit.rest.pulls.dismissReview({
               ...context.repo,
               pull_number: context.issue.number,
               review_id,
-              message: "Removing outdated review.",
-            });
+              message: 'Removing outdated review.'
+            })
           } else {
-            core.debug(`No existing reviews found.`);
+            core.debug(`No existing reviews found.`)
           }
           // Check current state
-          const output = await check();
+          const output = await check()
           if (output.length === 0) {
             // Approve
-            core.debug("Approve review");
+            core.debug('Approve review')
             await octokit.rest.pulls.createReview({
               ...context.repo,
               pull_number: context.issue.number,
-              event: "APPROVE",
-            });
-            Promise.resolve();
+              event: 'APPROVE'
+            })
+            Promise.resolve()
           } else {
             // Request changes
-            core.debug("Request changes");
+            core.debug('Request changes')
             await octokit.rest.pulls.createReview({
               ...context.repo,
               pull_number: context.issue.number,
               body: `Please format your code using [rustfmt](https://github.com/rust-lang/rustfmt): \`cargo fmt\``,
-              event: "REQUEST_CHANGES",
+              event: 'REQUEST_CHANGES',
               comments: output.map((result) => ({
                 path: result.path.replace(
                   `${process.env.GITHUB_WORKSPACE}/`,
-                  "",
+                  ''
                 ),
                 body: `\`\`\`suggestion
 ${result.mismatch.expected}\`\`\``,
@@ -149,24 +147,24 @@ ${result.mismatch.expected}\`\`\``,
                   result.mismatch.original_begin_line
                     ? result.mismatch.original_begin_line
                     : result.mismatch.original_end_line,
-                side: "RIGHT",
-              })),
-            });
+                side: 'RIGHT'
+              }))
+            })
           }
         }
-        break;
-      case "pull":
+        break
+      case 'pull':
         // Open a pull request from a new branch with the formatted code
         {
           const head =
-            context.eventName === "pull_request" && context.payload.pull_request
+            context.eventName === 'pull_request' && context.payload.pull_request
               ? {
                   sha: context.payload.pull_request.head.sha,
-                  ref: `refs/heads/${context.payload.pull_request.head.ref}`,
+                  ref: `refs/heads/${context.payload.pull_request.head.ref}`
                 }
-              : { sha: context.sha, ref: context.ref };
-          const ref = `refs/heads/rustfmt-${head.sha}`;
-          await rustfmt(["-l"].concat(rustfmt_args)).then(async (paths) =>
+              : { sha: context.sha, ref: context.ref }
+          const ref = `refs/heads/rustfmt-${head.sha}`
+          await rustfmt(['-l'].concat(rustfmt_args)).then(async (paths) =>
             paths.length === 0
               ? // No formatting required
                 Promise.resolve()
@@ -174,7 +172,7 @@ ${result.mismatch.expected}\`\`\``,
                   .createRef({
                     ...context.repo,
                     ref,
-                    sha: head.sha,
+                    sha: head.sha
                   })
                   .then(async () =>
                     octokit.rest.git
@@ -185,58 +183,58 @@ ${result.mismatch.expected}\`\`\``,
                             path: normalize(
                               path.replace(
                                 `${process.env.GITHUB_WORKSPACE}/`,
-                                "",
-                              ),
+                                ''
+                              )
                             ),
-                            mode: "100644",
-                            type: "blob",
-                            content: await readFile(path, "utf8"),
-                          })),
+                            mode: '100644',
+                            type: 'blob',
+                            content: await readFile(path, 'utf8')
+                          }))
                         ),
-                        base_tree: head.sha,
+                        base_tree: head.sha
                       })
                       .then(async ({ data: { sha } }) =>
                         octokit.rest.git.createCommit({
                           ...context.repo,
                           message,
                           tree: sha,
-                          parents: [head.sha],
-                        }),
+                          parents: [head.sha]
+                        })
                       )
                       .then(async ({ data: { sha } }) =>
                         octokit.rest.git.updateRef({
                           ...context.repo,
-                          ref: ref.replace("refs/", ""),
-                          sha,
-                        }),
+                          ref: ref.replace('refs/', ''),
+                          sha
+                        })
                       )
-                      .then(async (_) => {
-                        _;
-                        const title = `Format code using rustfmt for ${head.sha}`;
-                        const body = `The code for commit \`${head.sha}\` on \`${head.ref.replace("refs/heads/", "")}\` has been formatted automatically using [rustfmt](https://github.com/rust-lang/rustfmt).
+                      .then(async () => {
+                        const title = `Format code using rustfmt for ${head.sha}`
+                        const body = `The code for commit \`${head.sha}\` on \`${head.ref.replace('refs/heads/', '')}\` has been formatted automatically using [rustfmt](https://github.com/rust-lang/rustfmt).
 Please review the changes and merge if everything looks good.
 
 ---
 
-Delete the \`${ref.replace("refs/heads/", "")}\` branch after merging or closing the pull request.`;
+Delete the \`${ref.replace('refs/heads/', '')}\` branch after merging or closing the pull request.`
                         return octokit.rest.pulls.create({
                           ...context.repo,
                           title,
-                          head: ref.replace("refs/heads/", ""),
-                          base: head.ref.replace("refs/heads/", ""),
-                          body,
-                        });
-                      }),
-                  ),
-          );
+                          head: ref.replace('refs/heads/', ''),
+                          base: head.ref.replace('refs/heads/', ''),
+                          body
+                        })
+                      })
+                  )
+          )
         }
-        break;
+        break
       default:
-        throw new Error(`Unsupported mode: ${mode}`);
+        throw new Error(`Unsupported mode: ${mode}`)
     }
-  } catch (error: any) {
-    core.setFailed(error.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    core.setFailed(message)
   }
 }
 
-run();
+run()

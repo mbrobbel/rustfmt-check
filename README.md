@@ -6,7 +6,8 @@ This action can be used to keep [Rust] code formatted correctly.
 
 ## Modes
 
-This action supports three different modes. The `commit` mode is the default mode.
+This action supports three different modes. The `commit` mode is the default
+mode.
 
 ### Commit
 
@@ -36,7 +37,8 @@ jobs:
 
 ### Review
 
-The action reviews the PR, either requesting formatting changes, or approving if no formatting is required.
+The action reviews the PR, either requesting formatting changes, or approving if
+no formatting is required.
 
 #### Example
 
@@ -64,6 +66,7 @@ jobs:
 ![Review mode](images/review.png)
 
 Please note that this mode requires:
+
 - A nightly Rust toolchain
 - [Allowing GitHub Actions to create or approve pull reqeuests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 
@@ -98,6 +101,7 @@ jobs:
 ![Pull request mode](images/pull.png)
 
 Please note that this mode requires:
+
 - [Allowing GitHub Actions to create or approve pull reqeuests](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository#preventing-github-actions-from-creating-or-approving-pull-requests).
 
 ## Arguments
