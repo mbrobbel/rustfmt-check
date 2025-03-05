@@ -5,6 +5,11 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    groups:
+      eslint:
+        applies-to: version-updates
+        patterns:
+          - "*eslint*"
 
   - package-ecosystem: github-actions
     directory: "/"
