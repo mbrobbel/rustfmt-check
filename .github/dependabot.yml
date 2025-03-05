@@ -2,16 +2,16 @@ version: 2
 
 updates:
   - package-ecosystem: npm
-    directory: "/"
+    directory: '/'
     schedule:
       interval: daily
     groups:
       eslint:
         applies-to: version-updates
         patterns:
-          - "*eslint*"
+          - '*eslint*'
 
   - package-ecosystem: github-actions
-    directory: "/"
+    directory: '/'
     schedule:
       interval: daily
