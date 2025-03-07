@@ -8,11 +8,11 @@ const config = {
   input: 'src/main.ts',
   output: {
     esModule: true,
-    file: 'dist/index.js',
+    file: 'dist/main.js',
     format: 'es',
     sourcemap: true
   },
-  plugins: [typescript(), nodeResolve({ preferBuiltins: true }), commonjs()]
+  plugins: [typescript(), nodeResolve(), commonjs()]
 }
 
 export default config
