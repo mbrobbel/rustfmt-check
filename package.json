@@ -4,8 +4,9 @@
   "private": true,
   "description": "Format Rust code using rustfmt",
   "exports": {
-    ".": "./dist/index.js"
+    ".": "./dist/main.js"
   },
+  "type": "module",
   "engines": {
     "node": ">=20"
   },

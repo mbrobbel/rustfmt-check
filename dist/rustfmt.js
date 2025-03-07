@@ -1,55 +1,17 @@
-"use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || (function () {
-    var ownKeys = function(o) {
-        ownKeys = Object.getOwnPropertyNames || function (o) {
-            var ar = [];
-            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
-            return ar;
-        };
-        return ownKeys(o);
-    };
-    return function (mod) {
-        if (mod && mod.__esModule) return mod;
-        var result = {};
-        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
-        __setModuleDefault(result, mod);
-        return result;
-    };
-})();
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const core = __importStar(require("@actions/core"));
-const exec = __importStar(require("@actions/exec"));
-const string_argv_1 = __importDefault(require("string-argv"));
-const os_1 = require("os");
+import * as core from '@actions/core';
+import * as exec from '@actions/exec';
+import stringArgv from 'string-argv';
+import { EOL } from 'os';
 const rustfmt = async (options = [], args = core.getInput('args')) => {
     let output = '';
     return exec
-        .exec('cargo', ['fmt'].concat((0, string_argv_1.default)(args)).concat(['--']).concat(options), {
+        .exec('cargo', ['fmt'].concat(stringArgv(args)).concat(['--']).concat(options), {
         listeners: {
             stdout: (data) => {
                 output += data.toString();
             }
         }
     })
-        .then(() => output.trim().split(os_1.EOL).filter(Boolean));
+        .then(() => output.trim().split(EOL).filter(Boolean));
 };
-exports.default = rustfmt;
+export default rustfmt;
