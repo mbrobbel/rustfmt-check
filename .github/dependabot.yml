@@ -10,6 +10,10 @@ updates:
         applies-to: version-updates
         patterns:
           - '*eslint*'
+      jest:
+        applies-to: version-updates
+        patterns:
+          - '*jest*'
 
   - package-ecosystem: github-actions
     directory: '/'
