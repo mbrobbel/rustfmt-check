@@ -25,5 +25,5 @@ inputs:
     default: Format Rust code using rustfmt
 
 runs:
-  using: node20
+  using: node24
   main: dist/main.js
