@@ -8,7 +8,7 @@
   },
   "type": "module",
   "engines": {
-    "node": ">=20"
+    "node": ">=24"
   },
   "scripts": {
     "build": "tsc",
@@ -16,7 +16,7 @@
     "format-check": "prettier --check .",
     "lint": "eslint .",
     "pack": "npx rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
-    "test": "jest --runInBand",
+    "test": "NODE_OPTIONS=--experimental-vm-modules NODE_NO_WARNINGS=1 jest --runInBand",
     "all": "npm run build && npm run format && npm run lint && npm run pack && npm test"
   },
   "repository": {
@@ -31,35 +31,32 @@
   "author": "mbrobbel",
   "license": "MIT",
   "dependencies": {
-    "@actions/core": "^1.11.1",
-    "@actions/exec": "^2.0.0",
-    "@actions/github": "^6.0.1",
+    "@actions/core": "^3.0.0",
+    "@actions/exec": "^3.0.0",
+    "@actions/github": "^9.0.0",
     "string-argv": "^0.3.2"
   },
   "devDependencies": {
-    "@eslint/compat": "^2.0.1",
-    "@jest/globals": "^30.2.0",
-    "@rollup/plugin-commonjs": "^29.0.1",
+    "@eslint/compat": "^2.0.3",
+    "@eslint/eslintrc": "^3.3.5",
+    "@eslint/js": "^10.0.1",
+    "@jest/globals": "^30.3.0",
+    "@rollup/plugin-commonjs": "^29.0.2",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
-    "@typescript-eslint/eslint-plugin": "^8.53.0",
-    "@typescript-eslint/parser": "^8.43.0",
-    "eslint": "^9.39.2",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "eslint": "^10.1.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.4",
-    "eslint-plugin-import": "^2.32.0",
-    "eslint-plugin-jest": "^29.12.1",
+    "eslint-plugin-jest": "^29.15.0",
     "eslint-plugin-prettier": "^5.5.5",
-    "globals": "^16.5.0",
-    "jest": "^30.2.0",
-    "prettier": "^3.7.4",
-    "prettier-eslint": "^16.4.2",
-    "rollup": "^4.59.0",
+    "globals": "^17.4.0",
+    "jest": "^30.3.0",
+    "prettier": "^3.8.1",
+    "rollup": "^4.59.1",
     "ts-jest": "^29.4.6",
     "ts-jest-resolver": "^2.0.1",
-    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "optionalDependencies": {
