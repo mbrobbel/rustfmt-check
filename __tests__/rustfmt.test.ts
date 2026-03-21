@@ -1,5 +1,6 @@
-import rustfmt from '../src/rustfmt'
-import check from '../src/check'
+import { jest } from '@jest/globals'
+import rustfmt from '../src/rustfmt.js'
+import check from '../src/check.js'
 
 jest.setTimeout(30000)
 
